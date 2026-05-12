@@ -277,12 +277,23 @@ function requireAuth() {
     return false;
   }
 
-  // Se não temos a chave em memória mas temos token, precisamos do unlock
+  // Se não temos a chave em memória mas temos token, verificar se temos dados
+  // suficientes para desbloquear (vault_salt obrigatório para PBKDF2)
   if (!LKCrypto.hasSessionKey()) {
-    // Mostrar ecrã de desbloqueio
+    const storedUser = LKApi.getStoredUser?.();
+    // Se não há vault_salt, a sessão está corrompida — redirecionar para login
+    if (!storedUser?.vault_salt) {
+      LKApi.clearTokens?.();
+      window.location.href = '/Lock%26Key/frontend/login.html';
+      return false;
+    }
     const lockOverlay = document.getElementById('session-lock');
     if (lockOverlay) {
       lockOverlay.classList.remove('hidden');
+    }
+    // Inicializar o auto-lock para que o botão "Desbloquear" funcione
+    if (typeof LKAutoLock !== 'undefined') {
+      LKAutoLock.init();
     }
     return false;
   }
