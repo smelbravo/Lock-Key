@@ -28,6 +28,14 @@
       <a href="notes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notas Seguras</span></a>
       <div class="sidebar-section-label">Ferramentas</div>
       <a href="#" class="nav-item" id="generator-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span>Gerador de Passwords</span></a>
+      <!-- Link Admin ó visÌvel apenas para admin/admin_master (controlado por JS) -->
+      <a href="admin.html" class="nav-item admin-nav-link" id="adminNavLink" style="display:none" data-page="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1l3 6 6 1-4.5 4 1 6L12 15l-5.5 3 1-6L3 8l6-1z"/>
+        </svg>
+        <span>Painel Admin</span>
+      </a>
+
       <div class="sidebar-section-label">Conta</div>
       <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Defini√ß√µes</span></a>
     </nav>
@@ -260,5 +268,21 @@
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/vault.js"></script>
+<script>
+// Mostrar link admin se utilizador for admin/admin_master
+(function showAdminLink() {
+    try {
+        const raw = sessionStorage.getItem('lk_user');
+        if (!raw) return;
+        const u = JSON.parse(raw);
+        if (u && ['admin','admin_master'].includes(u.role)) {
+            const el = document.getElementById('adminNavLink');
+            if (el) el.style.display = '';
+        }
+    } catch(e) {}
+})();
+</script>
 </body>
 </html>
+
+

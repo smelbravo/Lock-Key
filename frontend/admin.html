@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Lock & Key</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🔐</span>
+            <span class="logo-text">Lock <span class="logo-amp">&</span> Key</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu">✕</button>
+    </div>
+
+    <div class="sidebar-section-label">PAINEL ADMIN</div>
+    <ul class="sidebar-nav">
+        <li><a href="#" class="nav-link active" data-section="overview">
+            <span class="nav-icon">📊</span><span class="nav-label">Visão Geral</span>
+        </a></li>
+        <li><a href="#" class="nav-link" data-section="users">
+            <span class="nav-icon">👥</span><span class="nav-label">Utilizadores</span>
+        </a></li>
+        <li id="nav-audit"><a href="#" class="nav-link" data-section="audit">
+            <span class="nav-icon">📋</span><span class="nav-label">Audit Log</span>
+        </a></li>
+        <li id="nav-create-admin" class="master-only hidden"><a href="#" class="nav-link" data-section="create-admin">
+            <span class="nav-icon">🛡️</span><span class="nav-label">Criar Admin</span>
+        </a></li>
+    </ul>
+
+    <div class="sidebar-section-label">UTILIZADOR</div>
+    <ul class="sidebar-nav">
+        <li><a href="dashboard.html" class="nav-link">
+            <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+        </a></li>
+        <li><a href="#" class="nav-link" id="logoutBtn">
+            <span class="nav-icon">🚪</span><span class="nav-label">Sair</span>
+        </a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div class="user-details">
+                <div class="user-name" id="sidebarUsername">Admin</div>
+                <div class="user-email" id="sidebarRole">
+                    <span class="role-badge master">👑 Admin Master</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+    <header class="main-header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+            <div class="header-title">
+                <h1 id="pageTitle">Visão Geral</h1>
+                <p id="pageSubtitle">Painel de Administração</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="headerRoleBadge" class="role-badge master">👑 Admin Master</span>
+            <button class="icon-btn" id="themeToggle" aria-label="Alternar tema">🌙</button>
+        </div>
+    </header>
+
+    <div class="content-area">
+
+        <!-- ==============================
+             SECÇÃO: VISÃO GERAL
+             ============================== -->
+        <section id="section-overview" class="admin-section active">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statTotalUsers">—</div>
+                        <div class="stat-label">Utilizadores</div>
+                    </div>
+                </div>
+                <div class="stat-card accent-blue">
+                    <div class="stat-icon">🔐</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statVaultEntries">—</div>
+                        <div class="stat-label">Passwords Guardadas</div>
+                    </div>
+                </div>
+                <div class="stat-card accent-purple">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statNotes">—</div>
+                        <div class="stat-label">Notas Seguras</div>
+                    </div>
+                </div>
+                <div class="stat-card accent-green">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="statActiveSessions">—</div>
+                        <div class="stat-label">Sessões Ativas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de registos -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h2>Registos — Últimos 30 dias</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="registrationsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="admin-grid-2">
+                <!-- Distribuição de planos -->
+                <div class="admin-card">
+                    <div class="admin-card-header"><h2>Distribuição de Planos</h2></div>
+                    <div id="plansChart" class="plan-bars"></div>
+                </div>
+
+                <!-- Últimos logins -->
+                <div class="admin-card">
+                    <div class="admin-card-header"><h2>Últimos Logins</h2></div>
+                    <div id="recentLogins" class="recent-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================
+             SECÇÃO: UTILIZADORES
+             ============================== -->
+        <section id="section-users" class="admin-section">
+            <div class="admin-toolbar">
+                <div class="admin-search">
+                    <input type="text" id="userSearch" placeholder="Pesquisar por nome ou email…" class="form-input">
+                </div>
+                <div class="admin-filters">
+                    <select id="filterRole" class="form-select">
+                        <option value="">Todos os roles</option>
+                        <option value="user">Utilizador</option>
+                        <option value="admin">Admin</option>
+                        <option value="admin_master">Admin Master</option>
+                    </select>
+                    <select id="filterPlan" class="form-select">
+                        <option value="">Todos os planos</option>
+                        <option value="free">Free</option>
+                        <option value="pro">Pro</option>
+                        <option value="unlimited">Unlimited</option>
+                    </select>
+                    <select id="filterStatus" class="form-select">
+                        <option value="">Todos os estados</option>
+                        <option value="active">Ativo</option>
+                        <option value="suspended">Suspenso</option>
+                        <option value="banned">Banido</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <table class="admin-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Utilizador</th>
+                            <th>Role</th>
+                            <th>Plano</th>
+                            <th>Estado</th>
+                            <th>Passwords</th>
+                            <th>Último Login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="7" class="table-loading">A carregar…</td></tr>
+                    </tbody>
+                </table>
+                <div class="table-pagination" id="usersPagination"></div>
+            </div>
+        </section>
+
+        <!-- ==============================
+             SECÇÃO: AUDIT LOG
+             ============================== -->
+        <section id="section-audit" class="admin-section">
+            <div class="admin-toolbar">
+                <div class="admin-search">
+                    <input type="text" id="auditSearch" placeholder="Pesquisar por utilizador ou IP…" class="form-input">
+                </div>
+                <select id="filterAction" class="form-select">
+                    <option value="">Todas as ações</option>
+                </select>
+            </div>
+
+            <div class="admin-card">
+                <table class="admin-table" id="auditTable">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Utilizador</th>
+                            <th>Ação</th>
+                            <th>IP</th>
+                            <th>Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr><td colspan="5" class="table-loading">A carregar…</td></tr>
+                    </tbody>
+                </table>
+                <div class="table-pagination" id="auditPagination"></div>
+            </div>
+        </section>
+
+        <!-- ==============================
+             SECÇÃO: CRIAR ADMIN (apenas admin_master)
+             ============================== -->
+        <section id="section-create-admin" class="admin-section master-only hidden">
+            <div class="admin-card" style="max-width:560px">
+                <div class="admin-card-header">
+                    <h2>🛡️ Criar Conta Administrador</h2>
+                    <p class="card-subtitle">Cria contas com role Admin ou Admin Master</p>
+                </div>
+
+                <form id="createAdminForm" class="form-group-stack">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="newAdminUsername" class="form-input" placeholder="nome_admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="newAdminEmail" class="form-input" placeholder="admin@exemplo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password Mestra</label>
+                        <div class="input-group">
+                            <input type="password" id="newAdminPassword" class="form-input" placeholder="Password segura" required>
+                            <button type="button" class="input-suffix" id="toggleNewAdminPass">👁️</button>
+                        </div>
+                        <div class="strength-bar-wrap">
+                            <div class="strength-bar" id="newAdminStrengthBar"></div>
+                        </div>
+                        <p class="form-hint" id="newAdminStrengthText"></p>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <select id="newAdminRole" class="form-select">
+                                <option value="admin">Admin</option>
+                                <option value="admin_master">Admin Master</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Plano</label>
+                            <select id="newAdminPlan" class="form-select">
+                                <option value="free">Free</option>
+                                <option value="pro">Pro</option>
+                                <option value="unlimited" selected>Unlimited</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Permissões visuais por role -->
+                    <div class="permissions-preview" id="permissionsPreview">
+                        <div class="perm-title">Permissões do role selecionado:</div>
+                        <div id="permsList"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="createAdminBtn">
+                        Criar Administrador
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </div><!-- /.content-area -->
+</div><!-- /.main-content -->
+
+<!-- Modal: Detalhes / Editar Utilizador -->
+<div class="modal-overlay" id="userModal">
+    <div class="modal" style="max-width:560px">
+        <div class="modal-header">
+            <h3 class="modal-title" id="userModalTitle">Detalhes do Utilizador</h3>
+            <button class="modal-close" id="userModalClose">✕</button>
+        </div>
+        <div class="modal-body" id="userModalBody"></div>
+        <div class="modal-footer" id="userModalFooter"></div>
+    </div>
+</div>
+
+<!-- Modal: Confirmar Suspensão/Ban -->
+<div class="modal-overlay" id="suspendModal">
+    <div class="modal" style="max-width:440px">
+        <div class="modal-header">
+            <h3 class="modal-title" id="suspendModalTitle">Suspender Utilizador</h3>
+            <button class="modal-close" id="suspendModalClose">✕</button>
+        </div>
+        <div class="modal-body">
+            <p id="suspendModalDesc" style="margin-bottom:1rem;color:var(--text-secondary)"></p>
+            <div class="form-group">
+                <label class="form-label">Motivo</label>
+                <textarea id="suspendReason" class="form-input" rows="3" placeholder="Indica o motivo…"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="suspendCancelBtn">Cancelar</button>
+            <button class="btn btn-danger" id="suspendConfirmBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

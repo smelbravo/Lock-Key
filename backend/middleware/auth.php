@@ -43,7 +43,8 @@ class AuthMiddleware
         // Verificar se o token está revogado na BD
         $tokenHash = JWT::hash($token);
         $session   = Database::fetchOne(
-            'SELECT s.id, s.user_id, s.is_revoked, u.uuid, u.email, u.username, u.is_active
+            'SELECT s.id, s.user_id, s.is_revoked,
+                    u.uuid, u.email, u.username, u.is_active, u.role, u.plan, u.status
              FROM sessions s
              JOIN users u ON u.id = s.user_id
              WHERE s.token_hash = ?
@@ -56,8 +57,12 @@ class AuthMiddleware
             Response::unauthorized('Sessão inválida ou expirada. Faça login novamente.');
         }
 
-        if (!$session['is_active']) {
+        if (!$session['is_active'] || $session['status'] === 'banned') {
             Response::unauthorized('Conta desativada. Contacte o suporte.');
+        }
+
+        if ($session['status'] === 'suspended') {
+            Response::unauthorized('Conta suspensa. Contacte o suporte.');
         }
 
         // Atualizar last_activity (não crítico - ignorar falha)
@@ -71,10 +76,13 @@ class AuthMiddleware
         }
 
         return [
-            'id'       => (int) $payload['user_id'],
+            'user_id'  => (int) $session['user_id'],
+            'id'       => (int) $session['user_id'],
             'uuid'     => $session['uuid'],
             'email'    => $session['email'],
             'username' => $session['username'],
+            'role'     => $session['role'],
+            'plan'     => $session['plan'],
         ];
     }
 

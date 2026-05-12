@@ -62,6 +62,14 @@
         <span>Gerador de Passwords</span>
       </a>
 
+      <!-- Link Admin — visível apenas para admin/admin_master (controlado por JS) -->
+      <a href="admin.html" class="nav-item admin-nav-link" id="adminNavLink" style="display:none" data-page="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1l3 6 6 1-4.5 4 1 6L12 15l-5.5 3 1-6L3 8l6-1z"/>
+        </svg>
+        <span>Painel Admin</span>
+      </a>
+
       <div class="sidebar-section-label">Conta</div>
 
       <a href="settings.html" class="nav-item" data-page="settings">
@@ -281,5 +289,19 @@
 <script src="js/auth.js"></script>
 <script src="js/vault.js"></script>
 <script src="js/dashboard.js"></script>
+<script>
+// Mostrar link admin se utilizador for admin/admin_master
+(function showAdminLink() {
+    try {
+        const raw = sessionStorage.getItem('lk_user');
+        if (!raw) return;
+        const u = JSON.parse(raw);
+        if (u && ['admin','admin_master'].includes(u.role)) {
+            const el = document.getElementById('adminNavLink');
+            if (el) el.style.display = '';
+        }
+    } catch(e) {}
+})();
+</script>
 </body>
 </html>

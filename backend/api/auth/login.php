@@ -46,7 +46,7 @@ if (!preg_match('/^[0-9a-f]{64}$/', $authKey)) {
 // Obter utilizador
 $user = Database::fetchOne(
     'SELECT id, uuid, email, username, auth_key_hash, vault_salt, pbkdf2_iterations,
-            is_active, failed_login_attempts, locked_until
+            is_active, failed_login_attempts, locked_until, role, plan, status
      FROM users
      WHERE email = ?',
     [$email]
@@ -97,8 +97,11 @@ if (!$validCredentials) {
 }
 
 // Verificar se a conta está ativa
-if (!(bool) $user['is_active']) {
+if (!(bool) $user['is_active'] || $user['status'] === 'banned') {
     Response::error('Conta desativada. Contacte o suporte.', 403);
+}
+if ($user['status'] === 'suspended') {
+    Response::error('Conta suspensa. Contacte o suporte.', 403);
 }
 
 // Login bem-sucedido
@@ -142,6 +145,8 @@ Response::success([
         'uuid'     => $user['uuid'],
         'email'    => $user['email'],
         'username' => $user['username'],
+        'role'     => $user['role'],
+        'plan'     => $user['plan'],
         // Salt e iterações necessários para o cliente derivar as chaves
         'vault_salt'        => $user['vault_salt'],
         'pbkdf2_iterations' => (int) $user['pbkdf2_iterations'],
