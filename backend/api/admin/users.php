@@ -12,7 +12,7 @@
  */
 
 define('LK_APP', true);
-require_once dirname(__DIR__, 3) . '/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
 Response::requireMethod(['GET', 'POST', 'PATCH', 'DELETE']);
 
@@ -286,3 +286,4 @@ if ($method === 'DELETE') {
 
     Response::success(['message' => $action]);
 }
+

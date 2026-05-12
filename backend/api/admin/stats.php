@@ -8,7 +8,7 @@
  */
 
 define('LK_APP', true);
-require_once dirname(__DIR__, 3) . '/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
 Response::requireMethod(['GET']);
 $user = Auth::require();
@@ -81,3 +81,4 @@ Response::success([
     'audit_log'     => $auditEntries,
     'top_users'     => $topUsers,
 ]);
+

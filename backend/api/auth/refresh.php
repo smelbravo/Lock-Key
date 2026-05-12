@@ -28,7 +28,7 @@ $refreshHash = hash('sha256', $refreshToken);
 // Obter sessão com refresh token válido
 $session = Database::fetchOne(
     'SELECT s.id, s.user_id, s.is_extension, u.uuid, u.email, u.username,
-            u.vault_salt, u.pbkdf2_iterations, u.is_active
+            u.vault_salt, u.pbkdf2_iterations, u.is_active, u.role, u.plan, u.status
      FROM sessions s
      JOIN users u ON u.id = s.user_id
      WHERE s.refresh_hash = ?
@@ -41,8 +41,11 @@ if ($session === null) {
     Response::unauthorized('Refresh token inválido ou expirado.');
 }
 
-if (!(bool) $session['is_active']) {
+if (!(bool) $session['is_active'] || $session['status'] === 'banned') {
     Response::unauthorized('Conta desativada.');
+}
+if ($session['status'] === 'suspended') {
+    Response::unauthorized('Conta suspensa.');
 }
 
 try {
@@ -81,6 +84,8 @@ try {
             'uuid'              => $session['uuid'],
             'email'             => $session['email'],
             'username'          => $session['username'],
+            'role'              => $session['role'],
+            'plan'              => $session['plan'],
             'vault_salt'        => $session['vault_salt'],
             'pbkdf2_iterations' => (int) $session['pbkdf2_iterations'],
         ],
