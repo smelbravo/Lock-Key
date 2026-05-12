@@ -291,9 +291,9 @@ function requireAuth() {
     if (lockOverlay) {
       lockOverlay.classList.remove('hidden');
     }
-    // Inicializar o auto-lock para que o botão "Desbloquear" funcione
+    // Inicializar os botões do ecrã de bloqueio
     if (typeof LKAutoLock !== 'undefined') {
-      LKAutoLock.init();
+      LKAutoLock.initUnlockScreen();
     }
     return false;
   }

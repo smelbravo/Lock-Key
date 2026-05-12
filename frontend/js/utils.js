@@ -294,18 +294,16 @@ const LKAutoLock = (() => {
     }
   }
 
-  function init() {
-    const timeout = getTimeoutMs();
-    if (!timeout) return;
+  // Inicializar SEMPRE os botões do ecrã de bloqueio
+  // (independente do timeout — os botões têm de funcionar mesmo com timer desativado)
+  function initUnlockScreen() {
+    const unlockBtn    = document.getElementById('unlock-btn');
+    const lockLogoutBtn= document.getElementById('lock-logout-btn');
+    const toggleUnlock = document.getElementById('toggle-unlock');
+    const unlockInput  = document.getElementById('unlock-password');
 
-    // Resetar timer em qualquer interação
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
-    events.forEach(e => document.addEventListener(e, reset, { passive: true }));
-    reset();
-
-    // Configurar botão de desbloqueio
-    const unlockBtn = document.getElementById('unlock-btn');
-    if (unlockBtn) {
+    if (unlockBtn && !unlockBtn._lkInit) {
+      unlockBtn._lkInit = true;
       unlockBtn.addEventListener('click', async () => {
         const passwordInput = document.getElementById('unlock-password');
         const password = passwordInput?.value;
@@ -319,7 +317,12 @@ const LKAutoLock = (() => {
 
         try {
           const user = LKApi.getStoredUser();
-          if (!user) throw new Error('Dados de sessão perdidos.');
+          if (!user?.vault_salt) {
+            // Sem dados de sessão — redirecionar para login
+            LKApi.clearTokens();
+            window.location.href = '/Lock%26Key/frontend/login.html';
+            return;
+          }
 
           const { encryptionKey } = await LKCrypto.deriveKeys(
             password, user.email, user.vault_salt, user.pbkdf2_iterations
@@ -331,41 +334,51 @@ const LKAutoLock = (() => {
           reset();
           LKToast.success('Sessão desbloqueada!');
         } catch {
-          LKToast.error('Senha incorreta.');
+          LKToast.error('Senha mestra incorreta.');
         } finally {
           LKUtils.setButtonLoading(unlockBtn, false);
         }
       });
     }
 
-    // Botão de logout no ecrã de bloqueio
-    const lockLogoutBtn = document.getElementById('lock-logout-btn');
-    if (lockLogoutBtn) {
+    if (lockLogoutBtn && !lockLogoutBtn._lkInit) {
+      lockLogoutBtn._lkInit = true;
       lockLogoutBtn.addEventListener('click', async () => {
         await LKApi.logout();
         window.location.href = '/Lock%26Key/frontend/login.html';
       });
     }
 
-    // Mostrar/ocultar senha no unlock
-    const toggleUnlock = document.getElementById('toggle-unlock');
-    if (toggleUnlock) {
+    if (toggleUnlock && !toggleUnlock._lkInit) {
+      toggleUnlock._lkInit = true;
       toggleUnlock.addEventListener('click', () => {
         const input = document.getElementById('unlock-password');
         if (input) input.type = input.type === 'password' ? 'text' : 'password';
       });
     }
 
-    // Enter para desbloquear
-    const unlockInput = document.getElementById('unlock-password');
-    if (unlockInput) {
+    if (unlockInput && !unlockInput._lkInit) {
+      unlockInput._lkInit = true;
       unlockInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') unlockBtn?.click();
       });
     }
   }
 
-  return { init, reset, lockSession, getTimeoutMs };
+  function init() {
+    // Botões do ecrã de bloqueio são sempre inicializados
+    initUnlockScreen();
+
+    const timeout = getTimeoutMs();
+    if (!timeout) return;
+
+    // Resetar timer em qualquer interação do utilizador
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(e => document.addEventListener(e, reset, { passive: true }));
+    reset();
+  }
+
+  return { init, initUnlockScreen, reset, lockSession, getTimeoutMs };
 })();
 
 // ============================================================
