@@ -6,7 +6,7 @@
 'use strict';
 
 // URL base da API (deve corresponder ao servidor local)
-const API_BASE = 'http://localhost/lockandkey/backend/api';
+const API_BASE = 'http://localhost/Lock&Key/backend/api';
 
 // Módulo de criptografia adaptado para a extensão
 const ExtCrypto = {

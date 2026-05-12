@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (LKApi.isLoggedIn() && LKCrypto.hasSessionKey()) {
     const page = LKUtils.getCurrentPage();
     if (page === 'login' || page === 'register') {
-      window.location.href = '/lockandkey/frontend/dashboard.html';
+      window.location.href = '/Lock&Key/frontend/dashboard.html';
       return;
     }
   }
@@ -87,7 +87,7 @@ function initLoginPage() {
         // Login bem-sucedido → redirecionar para dashboard
         LKToast.success('Login efetuado com sucesso!');
         setTimeout(() => {
-          window.location.href = '/lockandkey/frontend/dashboard.html';
+          window.location.href = '/Lock&Key/frontend/dashboard.html';
         }, 500);
 
       } catch (err) {
@@ -239,7 +239,7 @@ function initRegisterPage() {
         LKToast.success('Conta criada com sucesso! A redirecionar para o login...');
 
         setTimeout(() => {
-          window.location.href = '/lockandkey/frontend/login.html?registered=1';
+          window.location.href = '/Lock&Key/frontend/login.html?registered=1';
         }, 1500);
 
       } catch (err) {
@@ -273,7 +273,7 @@ function initRegisterPage() {
  */
 function requireAuth() {
   if (!LKApi.isLoggedIn()) {
-    window.location.href = '/lockandkey/frontend/login.html';
+    window.location.href = '/Lock&Key/frontend/login.html';
     return false;
   }
 
