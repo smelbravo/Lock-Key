@@ -94,8 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['token'] ?? '') === SETUP_T
         $saltBytes  = random_bytes(32);
         $vaultSalt  = bin2hex($saltBytes);
 
+        // IMPORTANTE: O frontend usa PBKDF2(password, UTF8(salt_hex + email), 200000, 512bits)
+        // O salt do PBKDF2 é a concatenação do salt hexadecimal com o email em minúsculas
+        // Isto replica exatamente o que o browser faz em crypto.js:
+        //   const saltBytes = encode(salt + email.toLowerCase()); // TextEncoder UTF-8
+        $pbkdf2Salt = $vaultSalt . strtolower($adminData['email']);
+
         // Derivar chave com PBKDF2-SHA256 (200.000 iterações, 64 bytes = 512 bits)
-        $derived    = hash_pbkdf2('sha256', $adminData['password'], $saltBytes, 200000, 64, true);
+        $derived    = hash_pbkdf2('sha256', $adminData['password'], $pbkdf2Salt, 200000, 64, true);
 
         // Primeiros 32 bytes = authKey
         $authKeyRaw = substr($derived, 0, 32);
