@@ -17,7 +17,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh;
   overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -241,9 +241,10 @@ ul { list-style: none; }
   justify-content: center;
   padding: var(--space-4);
   opacity: 0;
+  pointer-events: none; /* CRÍTICO: impede bloqueio de cliques quando invisível */
   transition: opacity 0.2s ease;
 }
-.modal-overlay.active { opacity: 1; }
+.modal-overlay.active { opacity: 1; pointer-events: all; }
 
 .modal {
   background: var(--bg-secondary);
@@ -423,7 +424,7 @@ ul { list-style: none; }
 
 /* Hero Section */
 .hero {
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;

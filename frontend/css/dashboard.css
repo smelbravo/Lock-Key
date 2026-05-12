@@ -6,7 +6,8 @@
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--header-height) 1fr;
-  min-height: 100vh;
+  min-height: 100vh; height: 100dvh;
+  min-height: 100dvh; /* dvh cobre barra de favoritos do Firefox e outros elementos de browser */
   transition: grid-template-columns 0.3s ease;
 }
 .app-layout.sidebar-collapsed { grid-template-columns: var(--sidebar-collapsed) 1fr; }
@@ -81,7 +82,7 @@
   width: var(--sidebar-width);
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100vh; height: 100dvh;
 }
 .app-layout.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed); }
 
@@ -188,6 +189,25 @@
   padding: var(--space-4);
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
+}
+
+/* Rodapé da sidebar para painéis admin */
+.sidebar-user-footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.sidebar-user-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .collapse-btn {
@@ -656,7 +676,7 @@
     position: fixed;
     top: 0; left: -280px;
     width: var(--sidebar-width) !important;
-    height: 100vh;
+    height: 100vh; height: 100dvh;
     z-index: var(--z-modal);
     transition: left 0.3s ease;
     box-shadow: var(--shadow-lg);

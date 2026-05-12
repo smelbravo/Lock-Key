@@ -2,6 +2,19 @@
    Lock & Key — Admin Panel Styles
    ============================================================ */
 
+/* Aliases para compatibilidade com variáveis do sistema de design */
+:root {
+  --bg-card:         var(--bg-secondary);
+  --bg-input:        var(--bg-tertiary);
+  --border:          var(--border-color);
+  --radius:          var(--border-radius);
+  --radius-sm:       var(--border-radius-sm);
+  --radius-lg:       var(--border-radius-lg);
+  --accent-blue:     var(--accent-primary);
+  --accent-blue-dim: rgba(59, 130, 246, 0.12);
+  --error:           var(--danger);
+}
+
 /* Role badges */
 .role-badge {
     display: inline-flex;
@@ -424,7 +437,8 @@
 .form-group-stack { display: flex; flex-direction: column; gap: 1rem; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .input-group { position: relative; display: flex; }
-.input-group .form-input { flex: 1; border-radius: var(--radius) 0 0 var(--radius); }
+.input-group .form-input,
+.input-group .input { flex: 1; }
 .input-suffix {
     padding: 0 0.75rem;
     background: var(--bg-input);

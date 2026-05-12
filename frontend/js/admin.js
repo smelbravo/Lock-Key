@@ -69,6 +69,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Inicializar botões do ecrã de bloqueio (o admin panel não precisa da chave de encriptação)
+    if (typeof LKAutoLock !== 'undefined') {
+        LKAutoLock.initUnlockScreen();
+        LKAutoLock.init();
+    }
+
     // O admin panel não necessita da chave de encriptação para funcionar,
     // mas precisa de um token válido para as chamadas à API.
     try {
@@ -106,25 +112,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initUI(user) {
     // Sidebar info
     const avatar = LKUtils.getInitials(user.username);
-    document.getElementById('sidebarAvatar').textContent   = avatar;
-    document.getElementById('sidebarUsername').textContent = user.username;
+    const avatarEl = document.getElementById('sidebarAvatar');
+    if (avatarEl) avatarEl.textContent = avatar;
+    const usernameEl = document.getElementById('sidebarUsername');
+    if (usernameEl) usernameEl.textContent = user.username;
+
+    // Header dropdown
+    const headerAvatarEl = document.getElementById('user-avatar');
+    if (headerAvatarEl) headerAvatarEl.textContent = avatar;
+    const dropNameEl  = document.getElementById('dropdown-name');
+    const dropEmailEl = document.getElementById('dropdown-email');
+    if (dropNameEl)  dropNameEl.textContent  = user.username;
+    if (dropEmailEl) dropEmailEl.textContent = user.email || '';
 
     // Role badge
     const isMaster = user.role === 'admin_master';
     const roleBadgeHTML = isMaster
-        ? '<span class="role-badge master">👑 Admin Master</span>'
-        : '<span class="role-badge admin">🛡️ Admin</span>';
+        ? '<span class="role-badge master">Admin Master</span>'
+        : '<span class="role-badge admin">Admin</span>';
 
-    document.getElementById('sidebarRole').innerHTML    = roleBadgeHTML;
-    document.getElementById('headerRoleBadge').outerHTML = roleBadgeHTML;
+    const sidebarRoleEl = document.getElementById('sidebarRole');
+    if (sidebarRoleEl) sidebarRoleEl.innerHTML = roleBadgeHTML;
+    const headerBadgeEl = document.getElementById('headerRoleBadge');
+    if (headerBadgeEl) headerBadgeEl.outerHTML = roleBadgeHTML;
 
     // Mostrar elementos exclusivos do admin_master
     if (isMaster) {
         document.querySelectorAll('.master-only').forEach(el => el.classList.remove('hidden'));
     }
 
-    // Navegação de secções
-    document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+    // Navegação de secções (suporta tanto .nav-item como .nav-link)
+    document.querySelectorAll('[data-section]').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
             switchSection(link.dataset.section);
@@ -135,20 +153,35 @@ function initUI(user) {
     LKTheme.init();
     document.getElementById('themeToggle')?.addEventListener('click', () => LKTheme.toggle());
 
-    // Sidebar toggle
+    // Sidebar toggle (collapse-sidebar é o novo ID, sidebarToggle o antigo)
+    document.getElementById('collapse-sidebar')?.addEventListener('click', () => {
+        document.getElementById('app-layout')?.classList.toggle('sidebar-collapsed');
+    });
     document.getElementById('menuToggle')?.addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('open');
     });
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('open');
-    });
 
-    // Logout
+    // Logout (sidebar + dropdown)
     document.getElementById('logoutBtn')?.addEventListener('click', async e => {
         e.preventDefault();
         await LKApi.logout();
         window.location.href = '/Lock%26Key/frontend/login.html';
     });
+    document.getElementById('logout-btn-dropdown')?.addEventListener('click', async () => {
+        await LKApi.logout();
+        window.location.href = '/Lock%26Key/frontend/login.html';
+    });
+
+    // Dropdown do utilizador no header
+    const headerAvatar = document.getElementById('user-avatar');
+    const headerDropdown = document.getElementById('user-dropdown');
+    if (headerAvatar && headerDropdown) {
+        headerAvatar.addEventListener('click', e => {
+            e.stopPropagation();
+            headerDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', () => headerDropdown.classList.remove('open'));
+    }
 
     // Pesquisa utilizadores (debounce)
     document.getElementById('userSearch')?.addEventListener('input',
@@ -213,12 +246,13 @@ function switchSection(name) {
     AdminState.currentSection = name;
 
     document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    // Suporta ambas as classes (nav-item é a nova, nav-link é a antiga)
+    document.querySelectorAll('.nav-item[data-section], .nav-link[data-section]').forEach(l => l.classList.remove('active'));
 
     const section = document.getElementById(`section-${name}`);
     if (section) section.classList.add('active');
 
-    const link = document.querySelector(`.nav-link[data-section="${name}"]`);
+    const link = document.querySelector(`[data-section="${name}"]`);
     if (link) link.classList.add('active');
 
     // Título da página

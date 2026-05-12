@@ -2,7 +2,7 @@
 @import url('variables.css');
 
 .auth-page {
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
