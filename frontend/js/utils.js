@@ -286,6 +286,10 @@ const LKAutoLock = (() => {
   }
 
   function lockSession() {
+    // Limpar chave de memória E do sessionStorage para forçar reintrodução de senha
+    // (apenas quando bloqueia por inatividade — logout limpa tudo via LKApi.logout)
+    if (typeof LKCrypto !== 'undefined') LKCrypto.clearSessionKey();
+
     const lockOverlay = document.getElementById('session-lock');
     if (lockOverlay) {
       lockOverlay.classList.remove('hidden');
@@ -324,10 +328,10 @@ const LKAutoLock = (() => {
             return;
           }
 
-          const { encryptionKey } = await LKCrypto.deriveKeys(
+          const { encryptionKey, rawKeyBytes } = await LKCrypto.deriveKeys(
             password, user.email, user.vault_salt, user.pbkdf2_iterations
           );
-          LKCrypto.storeSessionKey(encryptionKey);
+          LKCrypto.storeSessionKey(encryptionKey, rawKeyBytes);
 
           document.getElementById('session-lock').classList.add('hidden');
           passwordInput.value = '';

@@ -63,21 +63,26 @@ const ROLE_PERMISSIONS = {
 // Inicialização
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Verificar autenticação e role
-    const tokens = LKApi.getTokens?.() ?? {
-        accessToken: sessionStorage.getItem('lk_access_token'),
-    };
-    if (!tokens.accessToken) {
+    // Verificar autenticação (token JWT)
+    if (!LKApi.isLoggedIn()) {
         window.location.href = '/Lock%26Key/frontend/login.html';
         return;
     }
 
-    // Obter perfil
+    // O admin panel não necessita da chave de encriptação para funcionar,
+    // mas precisa de um token válido para as chamadas à API.
     try {
-        const res = await LKApi.getProfile();
-        if (!res.success) throw new Error('Sem acesso.');
+        // LKApi.getProfile() retorna res.data que agora tem formato { user: {...} }
+        const profileData = await LKApi.getProfile();
+        // Suportar ambos os formatos por compatibilidade
+        const u = profileData?.user ?? profileData;
 
-        const u = res.data.user;
+        if (!u?.role) {
+            LKToast.error('Não foi possível obter o perfil ou role.');
+            setTimeout(() => { window.location.href = '/Lock%26Key/frontend/login.html'; }, 1500);
+            return;
+        }
+
         AdminState.user = u;
 
         if (!['admin', 'admin_master'].includes(u.role)) {
@@ -89,7 +94,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         initUI(u);
         loadOverview();
     } catch (e) {
-        window.location.href = '/Lock%26Key/frontend/login.html';
+        console.error('Admin init error:', e);
+        LKToast.error('Erro ao carregar painel: ' + (e.message || 'Tenta novamente.'));
+        setTimeout(() => { window.location.href = '/Lock%26Key/frontend/login.html'; }, 2000);
     }
 });
 

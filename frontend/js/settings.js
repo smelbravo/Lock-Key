@@ -5,7 +5,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!requireAuth()) return;
+  if (!await requireAuth()) return;
   initDashboardLayout();
   LKAutoLock.init();
   initSettingsNav();
@@ -32,8 +32,8 @@ function initSettingsNav() {
 
 async function loadProfile() {
   try {
-    const profile = await LKApi.getProfile();
-    const user    = LKApi.getStoredUser();
+    const data    = await LKApi.getProfile();
+    const profile = data?.user ?? data; // compatibilidade com ambos os formatos
 
     if (profile) {
       document.getElementById('profile-name').textContent  = profile.username || '—';

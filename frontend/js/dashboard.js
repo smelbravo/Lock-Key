@@ -5,7 +5,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!requireAuth()) return;
+  if (!await requireAuth()) return;
   initDashboardLayout();
   LKAutoLock.init();
   await loadDashboardData();

@@ -71,7 +71,7 @@ function initLoginPage() {
 
         // PASSO 2: Derivar authKey e encryptionKey localmente
         // Este processo pode demorar alguns segundos (propositadamente - PBKDF2)
-        const { authKey, encryptionKey } = await LKCrypto.deriveKeys(
+        const { authKey, encryptionKey, rawKeyBytes } = await LKCrypto.deriveKeys(
           password,
           email,
           saltData.salt,
@@ -81,8 +81,10 @@ function initLoginPage() {
         // PASSO 3: Enviar apenas authKey ao servidor (nunca a senha real)
         const loginData = await LKApi.login(email, authKey);
 
-        // PASSO 4: Guardar encryptionKey em memória (NUNCA em storage)
-        LKCrypto.storeSessionKey(encryptionKey);
+        // PASSO 4: Guardar encryptionKey em memória e bytes raw em sessionStorage
+        // Os bytes raw permitem restaurar a chave ao navegar entre páginas
+        // sem pedir a senha mestra novamente (sessionStorage limpa ao fechar o browser)
+        LKCrypto.storeSessionKey(encryptionKey, rawKeyBytes);
 
         // Login bem-sucedido → redirecionar para dashboard
         LKToast.success('Login efetuado com sucesso!');
@@ -269,36 +271,38 @@ function initRegisterPage() {
 
 /**
  * Chama esta função nas páginas que requerem autenticação.
- * Redireciona para login se não autenticado.
+ * Tenta restaurar a chave de sessão do sessionStorage antes de mostrar o lock screen.
+ * É ASSÍNCRONA — usar com await: if (!await requireAuth()) return;
+ * @returns {Promise<boolean>}
  */
-function requireAuth() {
+async function requireAuth() {
   if (!LKApi.isLoggedIn()) {
     window.location.href = '/Lock%26Key/frontend/login.html';
     return false;
   }
 
-  // Se não temos a chave em memória mas temos token, verificar se temos dados
-  // suficientes para desbloquear (vault_salt obrigatório para PBKDF2)
+  // Tentar restaurar chave a partir do sessionStorage (navegação entre páginas)
   if (!LKCrypto.hasSessionKey()) {
-    const storedUser = LKApi.getStoredUser?.();
-    // Se não há vault_salt, a sessão está corrompida — redirecionar para login
-    if (!storedUser?.vault_salt) {
-      LKApi.clearTokens?.();
-      window.location.href = '/Lock%26Key/frontend/login.html';
-      return false;
-    }
-    const lockOverlay = document.getElementById('session-lock');
-    if (lockOverlay) {
-      lockOverlay.classList.remove('hidden');
-    }
-    // Inicializar os botões do ecrã de bloqueio
-    if (typeof LKAutoLock !== 'undefined') {
-      LKAutoLock.initUnlockScreen();
-    }
+    const restored = await LKCrypto.restoreSessionKey();
+    if (restored) return true; // chave restaurada — continuar normalmente
+  } else {
+    return true; // já temos a chave em memória
+  }
+
+  // Chave não foi restaurada — verificar se temos dados suficientes para o lock screen
+  const storedUser = LKApi.getStoredUser?.();
+  if (!storedUser?.vault_salt) {
+    // Sessão corrompida — redirecionar para login
+    LKApi.clearTokens?.();
+    window.location.href = '/Lock%26Key/frontend/login.html';
     return false;
   }
 
-  return true;
+  // Mostrar ecrã de bloqueio (utilizador precisará reintroduzir senha mestra)
+  const lockOverlay = document.getElementById('session-lock');
+  if (lockOverlay) lockOverlay.classList.remove('hidden');
+  if (typeof LKAutoLock !== 'undefined') LKAutoLock.initUnlockScreen();
+  return false;
 }
 
 window.requireAuth = requireAuth;

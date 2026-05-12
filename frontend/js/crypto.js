@@ -127,7 +127,9 @@ const LKCrypto = (() => {
       ['encrypt', 'decrypt']
     );
 
-    return { authKey, encryptionKey };
+    // Retornar também os bytes raw para que possam ser persistidos em sessionStorage
+    // (necessário para restaurar a chave ao navegar entre páginas)
+    return { authKey, encryptionKey, rawKeyBytes: encKeyBytes };
   }
 
   // ============================================================
@@ -462,16 +464,46 @@ const LKCrypto = (() => {
   // GESTÃO DA CHAVE NA SESSÃO
   // ============================================================
 
-  const SESSION_KEY_STORAGE = 'lk_enc_key_ref';
+  const SESSION_KEY_REF = 'lk_enc_key_ref';
+  const SESSION_KEY_RAW = 'lk_enc_key_raw'; // bytes raw em base64 para restaurar entre páginas
 
-  // Armazena a CryptoKey em memória (não em localStorage/sessionStorage)
-  // Esta é a abordagem mais segura - a chave só existe em memória
   let _sessionEncKey = null;
 
-  function storeSessionKey(cryptoKey) {
+  /**
+   * Guardar chave em memória E os bytes raw em sessionStorage.
+   * sessionStorage é limpo ao fechar o browser/tab — compromisso
+   * razoável entre segurança e usabilidade (chave nunca vai ao servidor).
+   */
+  function storeSessionKey(cryptoKey, rawBytes = null) {
     _sessionEncKey = cryptoKey;
-    // Marcar que temos uma chave válida (sem armazenar a chave em si)
-    sessionStorage.setItem(SESSION_KEY_STORAGE, '1');
+    sessionStorage.setItem(SESSION_KEY_REF, '1');
+    if (rawBytes) {
+      // Guardar bytes raw em base64 para restaurar na próxima página
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(rawBytes)));
+      sessionStorage.setItem(SESSION_KEY_RAW, b64);
+    }
+  }
+
+  /**
+   * Tentar restaurar a chave a partir do sessionStorage.
+   * Chamado em cada página no requireAuth() antes de mostrar o ecrã de bloqueio.
+   * @returns {Promise<boolean>} true se restaurada com sucesso
+   */
+  async function restoreSessionKey() {
+    if (_sessionEncKey !== null) return true; // já em memória
+    const raw = sessionStorage.getItem(SESSION_KEY_RAW);
+    if (!raw) return false;
+    try {
+      const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+      _sessionEncKey = await crypto.subtle.importKey(
+        'raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
+      );
+      sessionStorage.setItem(SESSION_KEY_REF, '1');
+      return true;
+    } catch {
+      clearSessionKey();
+      return false;
+    }
   }
 
   function getSessionKey() {
@@ -480,7 +512,8 @@ const LKCrypto = (() => {
 
   function clearSessionKey() {
     _sessionEncKey = null;
-    sessionStorage.removeItem(SESSION_KEY_STORAGE);
+    sessionStorage.removeItem(SESSION_KEY_REF);
+    sessionStorage.removeItem(SESSION_KEY_RAW);
   }
 
   function hasSessionKey() {
@@ -504,6 +537,7 @@ const LKCrypto = (() => {
     evaluatePasswordStrength,
     generatePassword,
     storeSessionKey,
+    restoreSessionKey,
     getSessionKey,
     clearSessionKey,
     hasSessionKey,

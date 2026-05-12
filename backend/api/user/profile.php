@@ -21,12 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     );
 
     $userData = Database::fetchOne(
-        'SELECT uuid, email, username, created_at, last_login, last_login_ip
+        'SELECT uuid, email, username, role, plan, status, created_at, last_login, last_login_ip
          FROM users WHERE id = ?',
         [$user['id']]
     );
 
-    Response::success(array_merge($userData ?? [], $stats ?? []));
+    Response::success(['user' => array_merge($userData ?? [], $stats ?? [])]);
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body    = Response::getJsonBody();
