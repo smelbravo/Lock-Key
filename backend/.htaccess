@@ -19,7 +19,7 @@ ServerSignature Off
 # Permitir apenas requisições JSON na API
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /Lock&Key/backend/
+    RewriteBase /Lock%26Key/backend/
 
     # Bloquear acesso a ficheiros de configuração
     RewriteRule ^config/ - [F,L]

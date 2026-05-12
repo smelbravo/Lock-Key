@@ -343,7 +343,7 @@ const LKAutoLock = (() => {
     if (lockLogoutBtn) {
       lockLogoutBtn.addEventListener('click', async () => {
         await LKApi.logout();
-        window.location.href = '/Lock&Key/frontend/login.html';
+        window.location.href = '/Lock%26Key/frontend/login.html';
       });
     }
 
@@ -437,7 +437,7 @@ function initDashboardLayout() {
         try {
           await LKApi.logout();
         } finally {
-          window.location.href = '/Lock&Key/frontend/login.html';
+          window.location.href = '/Lock%26Key/frontend/login.html';
         }
       }
     });
@@ -463,3 +463,5 @@ window.LKUtils  = LKUtils;
 window.LKTheme  = LKTheme;
 window.LKAutoLock = LKAutoLock;
 window.initDashboardLayout = initDashboardLayout;
+
+

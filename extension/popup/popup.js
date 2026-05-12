@@ -6,7 +6,7 @@
 'use strict';
 
 // URL base da API (deve corresponder ao servidor local)
-const API_BASE = 'http://localhost/Lock&Key/backend/api';
+const API_BASE = 'http://localhost/Lock%26Key/backend/api';
 
 // Módulo de criptografia adaptado para a extensão
 const ExtCrypto = {
@@ -590,3 +590,4 @@ async function getStoredSession() {
 async function clearSession() {
   await browser.storage.local.remove('lk_session');
 }
+

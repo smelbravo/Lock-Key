@@ -9,7 +9,7 @@
 const LKApi = (() => {
 
   // URL base da API - ajusta conforme o teu ambiente
-  const BASE_URL = 'http://localhost/Lock&Key/backend/api';
+  const BASE_URL = 'http://localhost/Lock%26Key/backend/api';
 
   // ============================================================
   // GESTÃO DE TOKENS
@@ -92,13 +92,13 @@ const LKApi = (() => {
         } catch {
           clearTokens();
           LKCrypto.clearSessionKey();
-          window.location.href = '/Lock&Key/frontend/login.html';
+          window.location.href = '/Lock%26Key/frontend/login.html';
           throw new Error('Sessão expirada. Redirecionar para login.');
         }
       } else {
         clearTokens();
         LKCrypto.clearSessionKey();
-        window.location.href = '/Lock&Key/frontend/login.html';
+        window.location.href = '/Lock%26Key/frontend/login.html';
         throw new Error('Sessão terminada.');
       }
     }
@@ -304,3 +304,5 @@ const LKApi = (() => {
 })();
 
 window.LKApi = LKApi;
+
+

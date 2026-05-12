@@ -79,7 +79,7 @@ function initSettingsEvents() {
     if (!confirm('Tens a certeza? Serás desligado de todos os dispositivos.')) return;
     try {
       await LKApi.logout(true);
-      window.location.href = '/Lock&Key/frontend/login.html';
+      window.location.href = '/Lock%26Key/frontend/login.html';
     } catch (err) {
       LKToast.error(err.message);
     }
@@ -207,7 +207,7 @@ async function handleChangePassword() {
     setTimeout(() => {
       LKApi.clearTokens();
       LKCrypto.clearSessionKey();
-      window.location.href = '/Lock&Key/frontend/login.html';
+      window.location.href = '/Lock%26Key/frontend/login.html';
     }, 2000);
 
   } catch (err) {
@@ -216,3 +216,5 @@ async function handleChangePassword() {
     LKUtils.setButtonLoading(btn, false);
   }
 }
+
+

@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         accessToken: sessionStorage.getItem('lk_access_token'),
     };
     if (!tokens.accessToken) {
-        window.location.href = '/Lock&Key/frontend/login.html';
+        window.location.href = '/Lock%26Key/frontend/login.html';
         return;
     }
 
@@ -82,14 +82,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!['admin', 'admin_master'].includes(u.role)) {
             LKToast.error('Sem permissão para aceder ao painel admin.');
-            setTimeout(() => { window.location.href = '/Lock&Key/frontend/dashboard.html'; }, 1500);
+            setTimeout(() => { window.location.href = '/Lock%26Key/frontend/dashboard.html'; }, 1500);
             return;
         }
 
         initUI(u);
         loadOverview();
     } catch (e) {
-        window.location.href = '/Lock&Key/frontend/login.html';
+        window.location.href = '/Lock%26Key/frontend/login.html';
     }
 });
 
@@ -140,7 +140,7 @@ function initUI(user) {
     document.getElementById('logoutBtn')?.addEventListener('click', async e => {
         e.preventDefault();
         await LKApi.logout();
-        window.location.href = '/Lock&Key/frontend/login.html';
+        window.location.href = '/Lock%26Key/frontend/login.html';
     });
 
     // Pesquisa utilizadores (debounce)
@@ -735,3 +735,5 @@ document.addEventListener('click', e => {
         e.target.classList.remove('active');
     }
 });
+
+
