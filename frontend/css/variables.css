@@ -1,0 +1,119 @@
+/* Lock & Key - Variáveis CSS Globais
+   Paleta inspirada em gestores de passwords premium (Bitwarden, 1Password)
+   com identidade visual única: azul-escuro + ciano/violeta */
+
+:root {
+  /* === Cores Base === */
+  --bg-primary:    #080d1a;   /* Fundo mais escuro */
+  --bg-secondary:  #0f1729;   /* Cards e sidebar */
+  --bg-tertiary:   #162035;   /* Hover states, inputs */
+  --bg-elevated:   #1c2840;   /* Modais, dropdowns */
+  --bg-glass:      rgba(15, 23, 41, 0.85); /* Glassmorphism */
+
+  /* === Cores de Texto === */
+  --text-primary:   #f0f4ff;
+  --text-secondary: #8fa3c8;
+  --text-muted:     #4f6380;
+  --text-disabled:  #2d3d54;
+
+  /* === Cores de Destaque === */
+  --accent-primary:  #3b82f6;  /* Azul primário */
+  --accent-hover:    #2563eb;
+  --accent-active:   #1d4ed8;
+  --accent-cyan:     #06b6d4;  /* Ciano para gradients */
+  --accent-violet:   #7c3aed;  /* Violeta para gradients */
+  --accent-gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --accent-gradient-vivid: linear-gradient(135deg, #7c3aed, #3b82f6, #06b6d4);
+
+  /* === Cores de Estado === */
+  --success:        #10b981;
+  --success-bg:     rgba(16, 185, 129, 0.12);
+  --warning:        #f59e0b;
+  --warning-bg:     rgba(245, 158, 11, 0.12);
+  --danger:         #ef4444;
+  --danger-bg:      rgba(239, 68, 68, 0.12);
+  --info:           #3b82f6;
+  --info-bg:        rgba(59, 130, 246, 0.12);
+
+  /* === Força de Password === */
+  --strength-very-weak:  #ef4444;
+  --strength-weak:       #f97316;
+  --strength-fair:       #f59e0b;
+  --strength-strong:     #84cc16;
+  --strength-very-strong:#10b981;
+
+  /* === Bordas === */
+  --border-color:         rgba(59, 130, 246, 0.15);
+  --border-hover:         rgba(59, 130, 246, 0.35);
+  --border-active:        rgba(59, 130, 246, 0.6);
+  --border-radius-sm:     6px;
+  --border-radius:        10px;
+  --border-radius-lg:     16px;
+  --border-radius-xl:     24px;
+  --border-radius-full:   9999px;
+
+  /* === Sombras === */
+  --shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg:   0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.25);
+  --shadow-glow-strong: 0 0 40px rgba(59, 130, 246, 0.4);
+
+  /* === Tipografia === */
+  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:  'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-size-xs:   11px;
+  --font-size-sm:   13px;
+  --font-size-base: 14px;
+  --font-size-md:   15px;
+  --font-size-lg:   18px;
+  --font-size-xl:   22px;
+  --font-size-2xl:  28px;
+  --font-size-3xl:  36px;
+  --font-size-4xl:  48px;
+
+  /* === Espaçamento === */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === Transições === */
+  --transition-fast:   all 0.15s ease;
+  --transition-normal: all 0.25s ease;
+  --transition-slow:   all 0.4s ease;
+
+  /* === Layout Dashboard === */
+  --sidebar-width:        260px;
+  --sidebar-collapsed:    72px;
+  --header-height:        64px;
+  --content-max-width:    1200px;
+
+  /* === Z-indexes === */
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-overlay:   300;
+  --z-modal:     400;
+  --z-toast:     500;
+  --z-tooltip:   600;
+}
+
+/* Tema Claro (ativado via classe .light-mode no body) */
+body.light-mode {
+  --bg-primary:    #f1f5fb;
+  --bg-secondary:  #ffffff;
+  --bg-tertiary:   #e8eef8;
+  --bg-elevated:   #ffffff;
+  --bg-glass:      rgba(255, 255, 255, 0.9);
+  --text-primary:  #0f172a;
+  --text-secondary:#374151;
+  --text-muted:    #6b7280;
+  --border-color:  rgba(59, 130, 246, 0.2);
+  --shadow-md:     0 4px 16px rgba(0, 0, 0, 0.08);
+}

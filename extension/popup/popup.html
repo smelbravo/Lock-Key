@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Lock & Key</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+<!-- Ecrã de Login -->
+<div id="screen-login" class="screen">
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Lock &amp; Key</div>
+      <div class="header-sub">Gestor de Passwords Seguro</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div id="login-error" class="error-msg hidden"></div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="o.teu@email.pt" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label>Senha Mestra</label>
+      <div class="input-wrap">
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        <button class="toggle-pass" id="toggle-login-pass" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="deriving-notice" class="hidden info-msg">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      A derivar chaves...
+    </div>
+
+    <button class="btn btn-primary" id="login-btn">Iniciar Sessão</button>
+
+    <p class="ext-link">
+      <a href="http://localhost/lockandkey/frontend/register.html" target="_blank">Criar conta gratuita →</a>
+    </p>
+  </div>
+</div>
+
+<!-- Ecrã Principal (Vault) -->
+<div id="screen-main" class="screen hidden">
+  <!-- Header do Popup -->
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div style="flex:1">
+      <div class="header-title">Lock &amp; Key</div>
+      <div class="header-sub" id="user-info">Utilizador</div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="sync-btn" title="Sincronizar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 .49-5.6"/>
+        </svg>
+      </button>
+      <button class="icon-btn danger" id="logout-btn" title="Terminar sessão">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- URL atual detetado -->
+  <div id="current-site-bar" class="hidden site-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+    <span id="current-domain" class="truncate"></span>
+    <button class="icon-btn-xs" id="autofill-all-btn" title="Preencher formulário">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="5 12 10 17 20 7"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Pesquisa -->
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" id="search-input" placeholder="Pesquisar passwords...">
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="all">Todas</div>
+    <div class="tab" data-tab="site">Este Site</div>
+    <div class="tab" data-tab="recent">Recentes</div>
+  </div>
+
+  <!-- Lista de Entradas -->
+  <div class="entries-list" id="entries-list">
+    <div class="loading">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+      </svg>
+      A carregar...
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a href="http://localhost/lockandkey/frontend/dashboard.html" target="_blank" class="footer-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Dashboard
+    </a>
+    <a href="http://localhost/lockandkey/frontend/vault.html" target="_blank" class="footer-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nova Entrada
+    </a>
+  </div>
+</div>
+
+<!-- Ecrã de Sessão Bloqueada -->
+<div id="screen-locked" class="screen hidden">
+  <div class="header" style="justify-content:center;padding:20px 16px">
+    <div class="logo" style="width:48px;height:48px;border-radius:14px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+  </div>
+  <div class="content" style="text-align:center">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">Sessão Bloqueada</h2>
+    <p style="font-size:12px;color:#8fa3c8;margin-bottom:20px">Introduz a senha mestra para continuar</p>
+    <div class="form-group">
+      <div class="input-wrap">
+        <input type="password" id="unlock-password" placeholder="Senha mestra" style="text-align:center">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="unlock-btn">Desbloquear</button>
+    <button class="btn btn-ghost" id="unlock-logout-btn" style="margin-top:8px;width:100%">Terminar Sessão</button>
+  </div>
+</div>
+
+<!-- Popup: Guardar Password Detectada -->
+<div id="save-credential-bar" class="hidden save-bar">
+  <div class="save-bar-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  </div>
+  <div class="save-bar-text">
+    <div style="font-weight:600;font-size:13px">Guardar credenciais?</div>
+    <div id="save-bar-domain" style="font-size:11px;color:#8fa3c8"></div>
+  </div>
+  <div class="save-bar-actions">
+    <button class="btn-xs btn-primary-xs" id="save-credential-btn">Guardar</button>
+    <button class="btn-xs btn-ghost-xs" id="dismiss-save-btn">✕</button>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

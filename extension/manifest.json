@@ -1,0 +1,56 @@
+{
+  "manifest_version": 2,
+  "name": "Lock & Key",
+  "version": "1.0.0",
+  "description": "Gestor de passwords Lock & Key — Autofill seguro e acesso rápido ao cofre.",
+  "author": "Lock & Key",
+
+  "icons": {
+    "16":  "assets/icon-16.png",
+    "32":  "assets/icon-32.png",
+    "48":  "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "16":  "assets/icon-16.png",
+      "32":  "assets/icon-32.png",
+      "48":  "assets/icon-48.png"
+    },
+    "default_popup": "popup/popup.html",
+    "default_title": "Lock & Key"
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "clipboardWrite",
+    "notifications",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background/background.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "lockandkey@extension",
+      "strict_min_version": "78.0"
+    }
+  }
+}

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cofre de Passwords — Lock & Key</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="app-layout" id="app-layout">
+
+  <!-- Sidebar (igual ao dashboard) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <span class="brand-name">Lock &amp; Key</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Dashboard</span></a>
+      <a href="vault.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Cofre de Passwords</span><span class="nav-badge" id="vault-count">0</span></a>
+      <a href="notes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notas Seguras</span></a>
+      <div class="sidebar-section-label">Ferramentas</div>
+      <a href="#" class="nav-item" id="generator-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span>Gerador de Passwords</span></a>
+      <div class="sidebar-section-label">Conta</div>
+      <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Definições</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="collapse-btn" id="collapse-sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Recolher</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="app-header">
+    <button class="btn btn-ghost btn-icon" id="mobile-menu-btn" style="display:none" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="input" placeholder="Pesquisar passwords... (Ctrl+K)" id="global-search">
+    </div>
+    <div class="header-spacer"></div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Alternar tema">
+        <svg id="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <div class="dropdown" id="user-dropdown">
+        <div class="user-avatar" id="user-avatar">JD</div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" style="pointer-events:none;opacity:0.7">
+            <div><div style="font-weight:600;font-size:13px" id="dropdown-name">Utilizador</div><div style="font-size:11px;color:var(--text-muted)" id="dropdown-email">email@exemplo.com</div></div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="settings.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Definições</a>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" id="logout-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Terminar Sessão</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Principal -->
+  <main class="app-content" style="display:flex;gap:var(--space-4);min-height:0">
+
+    <!-- Lista do Cofre -->
+    <div style="flex:1;min-width:0">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Cofre de Passwords</h1>
+          <p class="page-subtitle" id="entries-count-label">A carregar...</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="new-entry-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Entrada
+          </button>
+        </div>
+      </div>
+
+      <!-- Toolbar de Filtros -->
+      <div class="vault-toolbar">
+        <div class="filter-tabs">
+          <div class="filter-tab active" data-filter="all">Todas</div>
+          <div class="filter-tab" data-filter="favourite">⭐ Favoritas</div>
+          <div class="filter-tab" data-filter="weak">⚠️ Fracas</div>
+        </div>
+
+        <select class="input" id="category-filter" style="width:auto;padding:6px 12px;height:36px;font-size:13px">
+          <option value="">Todas as categorias</option>
+        </select>
+
+        <div class="view-toggle" style="margin-left:auto">
+          <div class="view-btn active" id="view-list" data-tooltip="Vista lista">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <div class="view-btn" id="view-grid" data-tooltip="Vista grelha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Entradas -->
+      <div id="vault-container">
+        <!-- Conteúdo gerado dinamicamente pelo vault.js -->
+        <div class="empty-state" id="vault-loading" style="display:none">
+          <div style="animation:spin 1s linear infinite;width:40px;height:40px;border:3px solid var(--border-color);border-top-color:var(--accent-primary);border-radius:50%"></div>
+        </div>
+        <div class="empty-state" id="vault-empty" style="display:none">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3 class="empty-state-title">Cofre vazio</h3>
+          <p class="empty-state-desc">Ainda não tens passwords guardadas. Adiciona a primeira entrada!</p>
+          <button class="btn btn-primary" id="empty-add-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar Password
+          </button>
+        </div>
+        <div class="vault-list" id="vault-list"></div>
+        <div class="vault-grid" id="vault-grid" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Painel de Detalhes -->
+    <div class="entry-detail-panel" id="entry-detail-panel" style="display:none">
+      <!-- Preenchido dinamicamente pelo vault.js -->
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Adicionar / Editar Entrada -->
+<div class="modal-overlay" id="entry-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Nova Entrada</h2>
+      <button class="modal-close" id="modal-close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="entry-form" novalidate>
+      <input type="hidden" id="entry-uuid">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Título *</label>
+          <input type="text" id="entry-title" class="input" placeholder="Ex: Google, Facebook, Banco..." required>
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">URL / Website</label>
+          <input type="text" id="entry-url" class="input" placeholder="https://exemplo.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Utilizador / Email</label>
+          <input type="text" id="entry-username" class="input" placeholder="utilizador@exemplo.com" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <div class="input-group">
+            <input type="password" id="entry-password" class="input" placeholder="••••••••" autocomplete="new-password" required>
+            <button type="button" class="input-addon" id="toggle-entry-pass">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <!-- Indicador de força -->
+          <div id="modal-strength" style="margin-top:6px">
+            <div class="strength-bar">
+              <div class="strength-segment"></div><div class="strength-segment"></div>
+              <div class="strength-segment"></div><div class="strength-segment"></div>
+              <div class="strength-segment"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:2px">
+              <span id="modal-strength-text">—</span>
+              <button type="button" id="generate-password-btn" style="background:none;border:none;color:var(--accent-primary);font-size:11px;cursor:pointer;font-family:inherit">⚡ Gerar password forte</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <input type="text" id="entry-category" class="input" placeholder="Ex: Redes Sociais, Banco...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <input type="text" id="entry-tags" class="input" placeholder="tag1, tag2, tag3">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Notas</label>
+          <textarea id="entry-notes" class="input" rows="3" placeholder="Notas adicionais..." style="resize:vertical"></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-weight:600;font-size:13px">Marcar como favorita</div>
+            <div style="font-size:11px;color:var(--text-muted)">Aparece no dashboard</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="entry-favourite">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button type="button" class="btn btn-secondary" id="modal-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="modal-save">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Confirmar Eliminação -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <div style="width:60px;height:60px;background:var(--danger-bg);border-radius:var(--border-radius-lg);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-5);color:var(--danger)">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:8px">Eliminar Entrada?</h3>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:24px">Esta ação é irreversível. A entrada será eliminada permanentemente.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-secondary" id="delete-cancel">Cancelar</button>
+      <button class="btn btn-danger" id="delete-confirm">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session Lock -->
+<div class="session-lock hidden" id="session-lock">
+  <div class="session-lock-inner animate-fade-in">
+    <div style="width:72px;height:72px;background:var(--accent-gradient);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-6);box-shadow:var(--shadow-glow-strong)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h2 style="font-size:24px;font-weight:800;margin-bottom:8px">Sessão Bloqueada</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:32px">Introduz a senha mestra para continuar.</p>
+    <div class="input-group" style="margin-bottom:16px">
+      <input type="password" id="unlock-password" class="input" placeholder="Senha mestra" style="height:48px">
+      <button type="button" class="input-addon" id="toggle-unlock">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button class="btn btn-primary" id="unlock-btn" style="width:100%;height:48px;font-size:15px;margin-bottom:16px">Desbloquear</button>
+    <button class="btn btn-ghost" id="lock-logout-btn" style="width:100%;font-size:13px">Terminar Sessão</button>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/vault.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+# Lock & Key - Configuração Apache para o Backend
+# Segurança: bloquear acesso direto a ficheiros PHP de configuração
+
+Options -Indexes -ExecCGI
+ServerSignature Off
+
+# Bloquear acesso a ficheiros sensíveis
+<FilesMatch "\.(env|log|sql|json|lock|md|example)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Bloquear acesso a diretórios de configuração e helpers diretamente
+<FilesMatch "^(config|helpers|middleware|bootstrap)\.php$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Permitir apenas requisições JSON na API
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /lockandkey/backend/
+
+    # Bloquear acesso a ficheiros de configuração
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^helpers/ - [F,L]
+    RewriteRule ^middleware/ - [F,L]
+    RewriteRule ^bootstrap\.php$ - [F,L]
+</IfModule>
+
+# Cabeçalhos de segurança
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Remover header que expõe a versão do servidor
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+# Desativar assinatura PHP
+<IfModule mod_php.c>
+    php_flag expose_php off
+    php_flag display_errors off
+    php_flag log_errors on
+    php_value max_execution_time 30
+    php_value memory_limit 128M
+    php_value post_max_size 10M
+    php_value upload_max_filesize 10M
+</IfModule>

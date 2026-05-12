@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta — Lock & Key</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<div class="auth-page">
+
+  <!-- Painel Visual Esquerdo -->
+  <div class="auth-visual">
+    <div class="auth-visual-bg"></div>
+    <div class="auth-visual-grid"></div>
+    <div class="auth-visual-content">
+      <a class="auth-visual-logo" href="index.html">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        Lock &amp; Key
+      </a>
+
+      <div class="lock-visual">
+        <svg viewBox="0 0 200 200" fill="none">
+          <defs>
+            <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#3b82f6"/>
+              <stop offset="100%" style="stop-color:#7c3aed"/>
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="90" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+          <rect x="50" y="100" width="100" height="70" rx="10" fill="url(#lg2)" opacity="0.85"/>
+          <path d="M68 100 V72 a32 32 0 0 1 64 0 V100" fill="none" stroke="url(#lg2)" stroke-width="12" stroke-linecap="round"/>
+          <circle cx="100" cy="132" r="8" fill="rgba(8,13,26,0.4)"/>
+          <rect x="97" y="132" width="6" height="14" rx="3" fill="rgba(8,13,26,0.4)"/>
+          <!-- Símbolo + de "novo" -->
+          <circle cx="148" cy="52" r="18" fill="url(#lg2)"/>
+          <line x1="148" y1="44" x2="148" y2="60" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <line x1="140" y1="52" x2="156" y2="52" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h2 class="auth-visual-title">Começa hoje, de graça</h2>
+      <p class="auth-visual-desc">Cria a tua conta e começa a guardar passwords com a máxima segurança. Sem limite de tempo.</p>
+
+      <div class="auth-features">
+        <div class="auth-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Gratuito para sempre — sem cartão de crédito</span>
+        </div>
+        <div class="auth-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span><strong>Zero-Knowledge</strong> — os teus dados pertencem-te</span>
+        </div>
+        <div class="auth-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Extensão Firefox incluída</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulário de Registo -->
+  <div class="auth-form-panel">
+    <div class="auth-form-container animate-fade-in">
+      <div class="auth-form-header">
+        <h1 class="auth-form-title">Criar Conta</h1>
+        <p class="auth-form-subtitle">Preenche os dados abaixo para começar</p>
+      </div>
+
+      <div id="auth-error" class="hidden" style="
+        padding:12px 16px;
+        background:var(--danger-bg);
+        border:1px solid rgba(239,68,68,0.3);
+        border-radius:var(--border-radius);
+        font-size:13px;
+        color:var(--danger);
+        margin-bottom:20px;
+        display:flex;align-items:center;gap:8px;
+      ">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <span id="auth-error-msg"></span>
+      </div>
+
+      <form class="auth-form" id="register-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">Nome de Utilizador</label>
+          <input type="text" id="username" name="username" class="input" placeholder="o_teu_username" autocomplete="username" required minlength="3" maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" id="email" name="email" class="input" placeholder="o.teu@email.pt" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Senha Mestra</label>
+          <div class="input-group">
+            <input type="password" id="password" name="password" class="input" placeholder="Mínimo 12 caracteres" autocomplete="new-password" required minlength="12">
+            <button type="button" class="input-addon" id="toggle-password" aria-label="Mostrar/ocultar senha">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Indicador de força -->
+          <div class="password-strength" id="strength-container" style="display:none">
+            <div class="strength-bar" id="strength-bar">
+              <div class="strength-segment"></div>
+              <div class="strength-segment"></div>
+              <div class="strength-segment"></div>
+              <div class="strength-segment"></div>
+              <div class="strength-segment"></div>
+            </div>
+            <div class="strength-label">
+              <span id="strength-text" style="color:var(--text-muted)">Muito fraca</span>
+              <span id="strength-score" style="color:var(--text-muted)">0/4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirm-password">Confirmar Senha Mestra</label>
+          <input type="password" id="confirm-password" name="confirm-password" class="input" placeholder="Repete a senha mestra" autocomplete="new-password" required>
+          <div id="password-match-error" class="form-error hidden">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            As senhas não coincidem
+          </div>
+        </div>
+
+        <div class="zk-notice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <div>
+            <strong>Aviso de Segurança Importante:</strong> A senha mestra é usada para encriptar os teus dados.
+            Se a perderes, <strong>não conseguimos recuperar os teus dados</strong>. Guarda-a num local seguro.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="register-btn" style="width:100%;height:48px;font-size:15px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+          Criar Conta
+        </button>
+
+        <div id="deriving-keys" class="hidden" style="
+          text-align:center;font-size:12px;color:var(--text-muted);
+          display:flex;align-items:center;justify-content:center;gap:8px;
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+          A gerar chaves criptográficas seguras...
+        </div>
+      </form>
+
+      <div class="auth-switch">
+        Já tens conta? <a href="login.html">Inicia sessão</a>
+      </div>
+
+      <div class="auth-terms" style="margin-top:16px">
+        Ao criar conta, aceitas os <a href="#">Termos de Serviço</a> e a <a href="#">Política de Privacidade</a>.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

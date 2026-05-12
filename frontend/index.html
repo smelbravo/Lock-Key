@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lock & Key - O gestor de passwords mais seguro. Encriptação AES-256, zero-knowledge, open source.">
+  <meta name="theme-color" content="#080d1a">
+  <title>Lock & Key — Gestor de Passwords Seguro</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <a class="navbar-brand" href="index.html">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    Lock &amp; Key
+  </a>
+
+  <nav class="navbar-nav">
+    <a href="#features">Funcionalidades</a>
+    <a href="#security">Segurança</a>
+    <a href="#pricing">Preços</a>
+    <a href="#about">Sobre</a>
+  </nav>
+
+  <div class="navbar-actions">
+    <a href="login.html" class="btn btn-ghost btn-sm">Iniciar Sessão</a>
+    <a href="register.html" class="btn btn-primary btn-sm">Criar Conta</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content animate-fade-in-up">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Encriptação Zero-Knowledge AES-256-GCM
+    </div>
+
+    <h1 class="hero-title">
+      As tuas passwords.<br>
+      <span class="gradient-text">Seguras para sempre.</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Lock &amp; Key protege as tuas credenciais com encriptação militar AES-256-GCM.
+      Os teus dados são encriptados localmente — nunca os vemos, nunca os guardamos em claro.
+    </p>
+
+    <div class="hero-actions">
+      <a href="register.html" class="btn btn-primary btn-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Começar Gratuitamente
+      </a>
+      <a href="#features" class="btn btn-secondary btn-lg">
+        Ver Funcionalidades →
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="stat-value">AES-256</div>
+        <div class="stat-label">Encriptação</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Dados em Claro</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Privacidade</div>
+      </div>
+      <div class="hero-stat">
+        <div class="stat-value">∞</div>
+        <div class="stat-label">Entradas</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-header">
+    <div class="section-tag">Funcionalidades</div>
+    <h2 class="section-title">Tudo o que precisas para estar protegido</h2>
+    <p class="section-desc">Um ecossistema completo de gestão de passwords com segurança de nível empresarial.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Cofre Encriptado</h3>
+      <p class="feature-desc">Armazena passwords, logins e notas com encriptação AES-256-GCM. Cada entrada tem um IV único — impossível de decifrar sem a tua senha mestra.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Zero-Knowledge</h3>
+      <p class="feature-desc">A tua senha mestra nunca sai do teu dispositivo. Os dados são encriptados localmente antes de serem enviados — nem nós conseguimos ler.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Gerador de Passwords</h3>
+      <p class="feature-desc">Gera passwords fortes e aleatórias com comprimento e complexidade configuráveis. Inclui indicador de força em tempo real.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Extensão Firefox</h3>
+      <p class="feature-desc">Deteta formulários de login automaticamente, preenche credenciais com um clique e guarda novas passwords enquanto navegas.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Notas Seguras</h3>
+      <p class="feature-desc">Guarda informações sensíveis como códigos de recuperação, documentos privados ou notas confidenciais — tudo encriptado.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+          <polyline points="17 6 23 6 23 12"/>
+        </svg>
+      </div>
+      <h3 class="feature-title">Exportar / Importar</h3>
+      <p class="feature-desc">Exporta o teu cofre encriptado para backup seguro. Importa de volta a qualquer momento sem expor nenhum dado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Security Section -->
+<section class="section security-section" id="security">
+  <div class="security-grid">
+    <div>
+      <div class="section-tag">Segurança</div>
+      <h2 class="section-title" style="text-align:left">Construído para paranóicos da privacidade</h2>
+      <p class="section-desc" style="text-align:left; margin-bottom:32px">
+        Cada detalhe foi pensado para garantir a máxima segurança. Não há atalhos.
+      </p>
+
+      <div class="security-list">
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">AES-256-GCM com IV único por entrada</div>
+            <div class="security-item-desc">Encriptação autenticada — detecta adulteração dos dados</div>
+          </div>
+        </div>
+
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">PBKDF2 com 200.000 iterações</div>
+            <div class="security-item-desc">Derivação de chave resistente a ataques de força bruta e GPU</div>
+          </div>
+        </div>
+
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">Argon2id para autenticação</div>
+            <div class="security-item-desc">O algoritmo de hash mais seguro disponível atualmente</div>
+          </div>
+        </div>
+
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">Rate limiting e proteção anti-brute force</div>
+            <div class="security-item-desc">Bloqueio automático após tentativas falhadas</div>
+          </div>
+        </div>
+
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">JWT com rotação de tokens</div>
+            <div class="security-item-desc">Access tokens de curta duração + refresh token seguro</div>
+          </div>
+        </div>
+
+        <div class="security-item">
+          <div class="security-item-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="security-item-title">Auto-logout por inatividade</div>
+            <div class="security-item-desc">Sessão bloqueada automaticamente após 30 minutos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <div style="position:relative;display:inline-block">
+        <svg width="300" height="300" viewBox="0 0 300 300" class="animate-float" style="filter:drop-shadow(0 0 40px rgba(59,130,246,0.4))">
+          <defs>
+            <linearGradient id="lockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#7c3aed"/>
+              <stop offset="50%" style="stop-color:#3b82f6"/>
+              <stop offset="100%" style="stop-color:#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <!-- Fundo circular -->
+          <circle cx="150" cy="150" r="140" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.15)" stroke-width="1"/>
+          <circle cx="150" cy="150" r="110" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.2)" stroke-width="1"/>
+          <!-- Cadeado -->
+          <rect x="90" y="140" width="120" height="90" rx="12" fill="url(#lockGrad)" opacity="0.9"/>
+          <path d="M110 140 V100 a40 40 0 0 1 80 0 V140" fill="none" stroke="url(#lockGrad)" stroke-width="14" stroke-linecap="round"/>
+          <!-- Buraco da chave -->
+          <circle cx="150" cy="178" r="12" fill="rgba(8,13,26,0.5)"/>
+          <rect x="146" y="178" width="8" height="20" rx="4" fill="rgba(8,13,26,0.5)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+  <div class="section-header">
+    <div class="section-tag">Preços</div>
+    <h2 class="section-title">Simples e transparente</h2>
+    <p class="section-desc">Começa gratuitamente. Sem truques, sem letras pequenas.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-name">Gratuito</div>
+      <div class="pricing-price">€0 <span>/mês</span></div>
+      <div class="pricing-features">
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Até 50 passwords
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Notas seguras
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Extensão Firefox
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Encriptação AES-256
+        </div>
+      </div>
+      <a href="register.html" class="btn btn-secondary" style="width:100%">Começar Agora</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="pricing-badge">⚡ Mais Popular</div>
+      <div class="pricing-name">Pro</div>
+      <div class="pricing-price">€3 <span>/mês</span></div>
+      <div class="pricing-features">
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Passwords ilimitadas
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Exportar / Importar
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Histórico de alterações
+        </div>
+        <div class="pricing-feature">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Suporte prioritário
+        </div>
+      </div>
+      <a href="register.html" class="btn btn-primary" style="width:100%">Começar Pro</a>
+    </div>
+  </div>
+</section>
+
+<!-- About / CTA -->
+<section class="cta-section" id="about">
+  <div class="section-tag">Lock & Key</div>
+  <h2 class="section-title" style="max-width:600px;margin:0 auto var(--space-5)">
+    Pronto para proteger as tuas passwords?
+  </h2>
+  <p class="section-desc" style="max-width:500px;margin:0 auto var(--space-8)">
+    Cria a tua conta gratuita em segundos. Os teus dados pertencem-te — e só a ti.
+  </p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+    <a href="register.html" class="btn btn-primary btn-lg">Criar Conta Gratuita</a>
+    <a href="login.html" class="btn btn-secondary btn-lg">Já tenho conta</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-content">
+    <div style="display:flex;align-items:center;gap:12px;font-weight:700">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-primary)">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Lock &amp; Key
+    </div>
+    <div>© 2026 Lock &amp; Key. Todos os direitos reservados.</div>
+    <div style="display:flex;gap:20px">
+      <a href="#">Privacidade</a>
+      <a href="#">Termos</a>
+      <a href="#">Segurança</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script src="js/utils.js"></script>
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+</script>
+</body>
+</html>

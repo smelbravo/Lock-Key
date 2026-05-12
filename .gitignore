@@ -1,0 +1,57 @@
+# ============================================================
+# Lock & Key — .gitignore
+# ============================================================
+
+# Ficheiros de ambiente (NUNCA fazer commit com credenciais!)
+config/.env
+.env
+*.env
+!config/.env.example
+
+# Dependências PHP (Composer)
+vendor/
+composer.lock
+
+# Logs e cache
+*.log
+logs/
+cache/
+tmp/
+temp/
+
+# Ficheiros de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ficheiros de upload (dados dos utilizadores)
+uploads/
+storage/
+
+# Ficheiros compilados / build
+node_modules/
+dist/
+build/
+
+# Ficheiros de teste locais
+*.test.local.php
+test_*.php
+
+# Ficheiros de backup
+*.bak
+*.backup
+*.sql.gz
+*.sql.bz2
+
+# Certificados SSL locais
+*.pem
+*.key
+*.crt
+*.cert
