@@ -150,7 +150,7 @@ Reinicia o Apache.
 
 Abre o browser Firefox e vai a:
 ```
-http://localhost/lockandkey/frontend/
+http://localhost/Lock&Key/frontend/
 ```
 
 ---
