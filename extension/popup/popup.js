@@ -22,10 +22,12 @@ const ExtCrypto = {
     );
     const authKey = Array.from(new Uint8Array(bits.slice(0, 32)))
       .map(b => b.toString(16).padStart(2, '0')).join('');
+    // Guardar os bytes raw ANTES de importar (chave não-extraível não pode ser exportada depois)
+    const rawKeyBytes = Array.from(new Uint8Array(bits.slice(32)));
     const encKey = await crypto.subtle.importKey(
-      'raw', bits.slice(32), { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
+      'raw', new Uint8Array(rawKeyBytes), { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
     );
-    return { authKey, encKey };
+    return { authKey, encKey, rawKeyBytes };
   },
 
   async decryptField(ciphertextB64, ivB64, key) {
@@ -193,8 +195,8 @@ async function handleLogin() {
     const saltRes = await apiRequest('/auth/get_salt.php', 'POST', { email });
     const { salt, iterations } = saltRes.data;
 
-    // Derivar chaves
-    const { authKey, encKey } = await ExtCrypto.deriveKeys(password, email, salt, iterations);
+    // Derivar chaves (rawKeyBytes já vem calculado, sem precisar de exportar depois)
+    const { authKey, encKey, rawKeyBytes } = await ExtCrypto.deriveKeys(password, email, salt, iterations);
 
     // Login
     const loginRes = await apiRequest('/auth/login.php', 'POST', {
@@ -207,13 +209,12 @@ async function handleLogin() {
     State.encKey      = encKey;
     State.user        = user;
 
-    // Guardar sessão (exportar rawKey para poder reimportar)
-    const rawKey = await crypto.subtle.exportKey('raw', encKey);
+    // Guardar sessão (usar rawKeyBytes já calculado — não é necessário exportar a chave)
     await saveSession({
       accessToken: access_token,
       refreshToken: refresh_token,
       user,
-      rawKey: Array.from(new Uint8Array(rawKey)),
+      rawKey: rawKeyBytes,
     });
 
     await showMainScreen();
