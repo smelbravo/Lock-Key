@@ -4,54 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gerador de Passwords – Lock &amp; Key</title>
+  <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <style>
-    .generator-page { max-width: 720px; margin: 0 auto; padding: 2rem; }
-    .gen-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; }
+    .generator-page { max-width: 720px; margin: 0 auto; }
+    .gen-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 2rem; margin-bottom: 1.5rem; }
     .gen-output-wrapper { position: relative; margin-bottom: 1.5rem; }
     .gen-output {
-      width: 100%; font-size: 1.5rem; font-family: 'Courier New', monospace;
-      background: var(--bg); border: 2px solid var(--primary); border-radius: 12px;
+      width: 100%; font-size: 1.4rem; font-family: var(--font-mono);
+      background: var(--bg-tertiary); border: 2px solid var(--border-active); border-radius: var(--border-radius);
       padding: 1rem 3.5rem 1rem 1rem; color: var(--text-primary);
       letter-spacing: 0.05em; word-break: break-all; min-height: 64px;
       display: flex; align-items: center;
     }
-    .gen-copy-btn {
+    .gen-copy-overlay {
       position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-      background: var(--primary); border: none; border-radius: 8px; padding: 0.5rem;
-      cursor: pointer; color: white; display: flex; align-items: center; justify-content: center;
-      transition: opacity .2s;
+      background: var(--accent-primary); border: none; border-radius: var(--border-radius-sm);
+      padding: 0.5rem; cursor: pointer; color: white; display: flex; align-items: center;
+      justify-content: center; transition: opacity .2s;
     }
-    .gen-copy-btn:hover { opacity: .85; }
-    .gen-copy-btn svg { width: 20px; height: 20px; }
-    .gen-strength-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; margin-bottom: 0.5rem; overflow: hidden; }
+    .gen-copy-overlay:hover { opacity: .85; }
+    .gen-copy-overlay svg { width: 18px; height: 18px; }
+    .gen-strength-bar-wrap { height: 8px; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 0.5rem; overflow: hidden; }
     .gen-strength-fill { height: 100%; border-radius: 4px; transition: width .4s, background .4s; }
-    .gen-strength-label { font-size: .8rem; color: var(--text-secondary); }
+    .gen-strength-label { font-size: .8rem; color: var(--text-muted); }
     .gen-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-    .gen-option { display: flex; align-items: center; gap: .6rem; font-size: .9rem; cursor: pointer; user-select: none; }
-    .gen-option input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+    .gen-option { display: flex; align-items: center; gap: .6rem; font-size: var(--font-size-sm); cursor: pointer; user-select: none; color: var(--text-secondary); }
+    .gen-option input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-primary); cursor: pointer; }
     .gen-slider-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-    .gen-slider-row label { font-size: .9rem; white-space: nowrap; min-width: 90px; }
-    .gen-slider-row input[type="range"] { flex: 1; accent-color: var(--primary); }
-    .gen-slider-val { font-size: .9rem; font-weight: 700; color: var(--primary); min-width: 28px; text-align: right; }
+    .gen-slider-row label { font-size: var(--font-size-sm); white-space: nowrap; min-width: 90px; color: var(--text-secondary); }
+    .gen-slider-row input[type="range"] { flex: 1; accent-color: var(--accent-primary); cursor: pointer; }
+    .gen-slider-val { font-size: var(--font-size-sm); font-weight: 700; color: var(--accent-primary); min-width: 28px; text-align: right; }
     .gen-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
     .gen-actions .btn { flex: 1; min-width: 140px; }
     .history-list { list-style: none; padding: 0; margin: 0; }
-    .history-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.65rem 0; border-bottom: 1px solid var(--border); gap: 1rem;
-    }
+    .history-item { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0; border-bottom: 1px solid var(--border-color); gap: 1rem; }
     .history-item:last-child { border-bottom: none; }
-    .history-pw { font-family: monospace; font-size: .9rem; flex: 1; word-break: break-all; color: var(--text-primary); }
-    .history-copy { background: none; border: 1px solid var(--border); border-radius: 6px; padding: .25rem .5rem; cursor: pointer; color: var(--text-secondary); font-size: .75rem; }
-    .history-copy:hover { border-color: var(--primary); color: var(--primary); }
-    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary); }
-    @media (max-width: 600px) {
-      .gen-options { grid-template-columns: 1fr; }
-      .gen-output { font-size: 1.1rem; }
-    }
+    .history-pw { font-family: var(--font-mono); font-size: var(--font-size-sm); flex: 1; word-break: break-all; color: var(--text-primary); }
+    .history-copy { background: none; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: .25rem .5rem; cursor: pointer; color: var(--text-muted); font-size: .75rem; }
+    .history-copy:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+    .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+    @media (max-width: 600px) { .gen-options { grid-template-columns: 1fr; } .gen-output { font-size: 1rem; } }
   </style>
 </head>
 <body>
@@ -69,9 +64,18 @@
     </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
-      <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Dashboard</span></a>
-      <a href="vault.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Cofre de Passwords</span></a>
-      <a href="notes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notas Seguras</span></a>
+      <a href="dashboard.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="vault.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Cofre de Passwords</span>
+      </a>
+      <a href="notes.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span>Notas Seguras</span>
+      </a>
       <div class="sidebar-section-label">Ferramentas</div>
       <a href="generator.html" class="nav-item active" id="generator-nav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
@@ -82,51 +86,71 @@
         <span>Painel Admin</span>
       </a>
       <div class="sidebar-section-label">Conta</div>
-      <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Definições</span></a>
+      <a href="settings.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Definições</span>
+      </a>
     </nav>
-    <button class="sidebar-collapse" id="collapse-sidebar" title="Recolher sidebar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
+    <div class="sidebar-footer">
+      <button class="collapse-btn" id="collapse-sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Recolher</span>
+      </button>
+    </div>
   </aside>
 
-  <!-- Conteúdo Principal -->
-  <main class="main-content">
-    <header class="top-bar">
-      <button class="mobile-menu-btn" id="mobile-menu-btn" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  <!-- Header -->
+  <header class="app-header">
+    <button class="btn btn-ghost btn-icon" id="mobile-menu-btn" style="display:none" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="header-spacer"></div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Alternar tema">
+        <svg id="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
-      <div style="flex:1"></div>
-      <div class="header-actions">
-        <button class="icon-btn" id="theme-toggle" title="Alternar tema">
-          <svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        </button>
-        <div class="user-dropdown" id="user-dropdown">
-          <button class="user-avatar" id="user-avatar">U</button>
-          <div class="dropdown-menu">
-            <div class="dropdown-header">
-              <strong id="dropdown-name">Utilizador</strong>
-              <span id="dropdown-email"></span>
+      <div class="dropdown" id="user-dropdown">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" style="pointer-events:none;opacity:0.7">
+            <div>
+              <div style="font-weight:600;font-size:13px" id="dropdown-name">Utilizador</div>
+              <div style="font-size:11px;color:var(--text-muted)" id="dropdown-email"></div>
             </div>
-            <a href="settings.html" class="dropdown-item">Definições</a>
-            <button class="dropdown-item danger" id="logout-btn">Terminar Sessão</button>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="settings.html" class="dropdown-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+            Definições
+          </a>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" id="logout-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Terminar Sessão
           </div>
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <div class="page-content generator-page">
-      <h1 class="page-title" style="margin-bottom:1.5rem">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:28px;height:28px;vertical-align:middle;margin-right:.5rem"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-        Gerador de Passwords
-      </h1>
+  <!-- Conteúdo Principal -->
+  <main class="app-content" style="overflow-y:auto">
+    <div class="page-content generator-page" style="padding:var(--space-6)">
+
+      <div class="page-header" style="margin-bottom:1.5rem">
+        <div>
+          <h1 class="page-title">Gerador de Passwords</h1>
+          <p class="page-subtitle">Cria passwords seguras e aleatórias</p>
+        </div>
+      </div>
 
       <!-- Card principal do gerador -->
       <div class="gen-card">
         <!-- Output da password -->
         <div class="gen-output-wrapper">
           <div class="gen-output" id="gen-output">Clica em "Gerar" para criar uma password</div>
-          <button class="gen-copy-btn" id="gen-copy-btn" title="Copiar password">
+          <button class="gen-copy-overlay" id="gen-copy-btn" title="Copiar password">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
         </div>
@@ -135,10 +159,10 @@
         <div class="gen-strength-bar-wrap">
           <div class="gen-strength-fill" id="gen-strength-fill" style="width:0%;background:var(--danger)"></div>
         </div>
-        <div class="gen-strength-label" id="gen-strength-label">—</div>
+        <div class="gen-strength-label" style="margin-bottom:1.5rem" id="gen-strength-label">—</div>
 
         <!-- Comprimento -->
-        <div class="gen-slider-row" style="margin-top:1.5rem">
+        <div class="gen-slider-row">
           <label for="gen-length">Comprimento</label>
           <input type="range" id="gen-length" min="8" max="128" value="20" step="1">
           <span class="gen-slider-val" id="gen-length-val">20</span>
@@ -168,54 +192,50 @@
           </label>
         </div>
 
-        <!-- Botões -->
+        <!-- Botões de ação -->
         <div class="gen-actions">
           <button class="btn btn-primary" id="gen-generate-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             Gerar Password
           </button>
           <button class="btn btn-secondary" id="gen-copy-btn2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar
           </button>
         </div>
       </div>
 
-      <!-- Histórico de passwords geradas -->
+      <!-- Histórico da sessão -->
       <div class="gen-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
           <p class="section-title" style="margin:0">Histórico desta sessão</p>
           <button class="btn btn-ghost" id="gen-clear-history" style="padding:.3rem .7rem;font-size:.8rem">Limpar</button>
         </div>
         <ul class="history-list" id="gen-history-list">
-          <li style="color:var(--text-secondary);font-size:.875rem;padding:.5rem 0">Nenhuma password gerada ainda.</li>
+          <li style="color:var(--text-muted);font-size:var(--font-size-sm);padding:.5rem 0">Nenhuma password gerada ainda.</li>
         </ul>
       </div>
+
     </div>
   </main>
 </div>
 
-<!-- Ecrã de bloqueio de sessão -->
+<!-- Session Lock -->
 <div class="session-lock hidden" id="session-lock">
-  <div class="session-lock-card">
-    <div class="lock-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="11" width="18" height="11" rx="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
+  <div class="session-lock-inner animate-fade-in">
+    <div style="width:72px;height:72px;background:var(--accent-gradient);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-6);box-shadow:var(--shadow-glow-strong)">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </div>
-    <h2>Sessão Bloqueada</h2>
-    <p>Introduz a tua senha mestra para continuar.</p>
-    <div class="lock-input-wrap">
-      <input type="password" id="unlock-password" placeholder="Senha mestra" autocomplete="current-password">
-      <button type="button" id="toggle-unlock" class="toggle-pass">
-        <svg id="eye-icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-        </svg>
+    <h2 style="font-size:24px;font-weight:800;margin-bottom:8px">Sessão Bloqueada</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:32px">Introduz a senha mestra para continuar.</p>
+    <div class="input-group" style="margin-bottom:16px">
+      <input type="password" id="unlock-password" class="input" placeholder="Senha mestra" style="height:48px">
+      <button type="button" class="input-addon" id="toggle-unlock">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
-    <button class="btn btn-primary w-full" id="unlock-btn">Desbloquear</button>
-    <button class="btn btn-ghost w-full" id="lock-logout-btn">Terminar Sessão</button>
+    <button class="btn btn-primary" style="width:100%;height:48px;margin-bottom:12px" id="unlock-btn">Desbloquear</button>
+    <button class="btn btn-ghost" style="width:100%;height:48px" id="lock-logout-btn">Terminar Sessão</button>
   </div>
 </div>
 

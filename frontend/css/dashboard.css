@@ -6,8 +6,10 @@
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--header-height) 1fr;
-  min-height: 100vh; height: 100dvh;
-  min-height: 100dvh; /* dvh cobre barra de favoritos do Firefox e outros elementos de browser */
+  height: 100vh;
+  height: 100dvh; /* dvh exclui barra de bookmarks do Firefox */
+  max-height: 100dvh;
+  overflow: hidden; /* evita scrollbar horizontal causada pela sidebar */
   transition: grid-template-columns 0.3s ease;
 }
 .app-layout.sidebar-collapsed { grid-template-columns: var(--sidebar-collapsed) 1fr; }
@@ -82,7 +84,7 @@
   width: var(--sidebar-width);
   position: sticky;
   top: 0;
-  height: 100vh; height: 100dvh;
+  height: 100dvh; /* ocupa exatamente a altura visível, excluindo barra de bookmarks */
 }
 .app-layout.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed); }
 
@@ -232,6 +234,7 @@
 .app-content {
   padding: var(--space-6);
   overflow-y: auto;
+  overflow-x: hidden;
   min-width: 0;
 }
 

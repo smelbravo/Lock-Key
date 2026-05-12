@@ -445,6 +445,12 @@ function initDashboardLayout() {
     if (nameEl)  nameEl.textContent  = user.username || 'Utilizador';
     if (emailEl) emailEl.textContent = user.email || '';
     if (avatar)  avatar.textContent  = LKUtils.getInitials(user.username || user.email);
+
+    // Mostrar link do painel admin para admins
+    if (user.role === 'admin' || user.role === 'admin_master') {
+      const adminLink = document.getElementById('adminNavLink');
+      if (adminLink) adminLink.style.display = '';
+    }
   }
 
   // Logout

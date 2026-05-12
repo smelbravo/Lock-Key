@@ -218,25 +218,21 @@ function initRegisterPage() {
       derivingDiv.style.display = 'flex';
 
       try {
-        // PASSO 1: Gerar salt único para este utilizador
-        // O salt é gerado no cliente e enviado ao servidor
-        // Neste fluxo, o servidor gerará um salt no registo
-        // Aqui precisamos obter um salt temporário para gerar o authKey
-        // Solução: Usamos um salt gerado localmente para o registo inicial
-        // O servidor irá gerar e armazenar o seu próprio salt
-        // Após o registo, fazemos login para obter o salt real do servidor
-
-        // Gerar um salt temporário (32 bytes hex)
-        const tempSaltBytes = crypto.getRandomValues(new Uint8Array(32));
-        const tempSalt = Array.from(tempSaltBytes)
+        // PASSO 1: Gerar salt único para este utilizador NO CLIENTE
+        // O cliente gera o vault_salt e envia-o ao servidor para ser armazenado.
+        // Desta forma, ao fazer login, get_salt.php devolve este mesmo salt,
+        // e o cliente deriva o mesmo authKey → autenticação bem-sucedida.
+        const saltBytes = crypto.getRandomValues(new Uint8Array(32));
+        const vaultSalt = Array.from(saltBytes)
           .map(b => b.toString(16).padStart(2, '0'))
           .join('');
 
-        // PASSO 2: Derivar authKey com o salt temporário
-        const { authKey } = await LKCrypto.deriveKeys(password, email, tempSalt, 200000);
+        // PASSO 2: Derivar authKey com o salt gerado pelo cliente
+        const { authKey } = await LKCrypto.deriveKeys(password, email, vaultSalt, 200000);
 
-        // PASSO 3: Enviar para o servidor (que gerará o seu próprio salt)
-        await LKApi.register(email, username, authKey);
+        // PASSO 3: Enviar email, username, authKey E vault_salt ao servidor
+        // O servidor armazena o salt para que o login funcione com o mesmo salt
+        await LKApi.register(email, username, authKey, vaultSalt);
 
         LKToast.success('Conta criada com sucesso! A redirecionar para o login...');
 

@@ -167,10 +167,10 @@ const LKApi = (() => {
     return res.data;
   }
 
-  async function register(email, username, authKey) {
+  async function register(email, username, authKey, vaultSalt) {
     return request('/auth/register.php', {
       method: 'POST',
-      body: JSON.stringify({ email, username, auth_key: authKey }),
+      body: JSON.stringify({ email, username, auth_key: authKey, vault_salt: vaultSalt }),
     }, false);
   }
 

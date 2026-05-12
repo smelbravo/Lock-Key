@@ -24,15 +24,16 @@ require_once dirname(__DIR__, 2) . '/bootstrap.php';
 Response::requireMethod('POST');
 
 $body = Response::getJsonBody();
-Response::requireFields($body, ['email', 'username', 'auth_key']);
+Response::requireFields($body, ['email', 'username', 'auth_key', 'vault_salt']);
 
 // Rate limiting por IP
 RateLimit::checkRegister();
 
 // Sanitizar e validar inputs
-$email    = strtolower(sanitize($body['email']));
-$username = sanitize($body['username'], 100);
-$authKey  = trim($body['auth_key'] ?? '');
+$email     = strtolower(sanitize($body['email']));
+$username  = sanitize($body['username'], 100);
+$authKey   = trim($body['auth_key'] ?? '');
+$vaultSalt = trim($body['vault_salt'] ?? '');
 
 // Validações
 if (!validateEmail($email)) {
@@ -46,6 +47,11 @@ if (strlen($username) < 3 || strlen($username) > 100) {
 // Validar authKey: deve ser hex de 64 chars (256 bits)
 if (!preg_match('/^[0-9a-f]{64}$/', $authKey)) {
     Response::error('Chave de autenticação inválida. Verifique o processo de derivação.', 422);
+}
+
+// Validar vault_salt: deve ser hex de 64 chars (256 bits)
+if (!preg_match('/^[0-9a-f]{64}$/', $vaultSalt)) {
+    Response::error('Salt inválido. Verifique o processo de derivação.', 422);
 }
 
 // Verificar se o email já existe
@@ -64,9 +70,9 @@ if ($existing !== null) {
 try {
     Database::beginTransaction();
 
-    // Gerar UUID e salt para o novo utilizador
-    $uuid      = Encryption::generateUUID();
-    $vaultSalt = Encryption::generateSalt(); // Salt PBKDF2 (enviado ao cliente no login)
+    // Gerar UUID para o novo utilizador
+    // O vault_salt vem do CLIENTE (para garantir que o login funciona com o mesmo salt)
+    $uuid = Encryption::generateUUID();
 
     // Hash do authKey com Argon2id (NUNCA armazenar authKey em claro)
     $authKeyHash = Encryption::hashPassword($authKey);

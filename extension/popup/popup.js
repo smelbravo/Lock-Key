@@ -98,17 +98,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Verificar sessão guardada
   const session = await getStoredSession();
 
-  if (session?.accessToken && session?.encKey) {
-    // Reconectar sessão
+  // Verificar se há sessão guardada com rawKey (chave armazenada como array de bytes)
+  if (session?.accessToken && session?.rawKey) {
     State.accessToken = session.accessToken;
     State.user        = session.user;
-    // Reimportar chave (estava guardada como raw bytes em storage)
+    // Reimportar chave a partir dos bytes raw guardados em storage
     try {
       State.encKey = await crypto.subtle.importKey(
         'raw', new Uint8Array(session.rawKey), { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']
       );
       await showMainScreen();
     } catch {
+      await clearSession();
       showLoginScreen();
     }
   } else {
