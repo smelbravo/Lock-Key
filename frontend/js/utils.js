@@ -433,7 +433,12 @@ function initDashboardLayout() {
         userDropdown.classList.toggle('open');
       });
     }
-    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+    // Fechar ao clicar fora do dropdown
+    document.addEventListener('click', (e) => {
+      if (!userDropdown.contains(e.target)) {
+        userDropdown.classList.remove('open');
+      }
+    });
   }
 
   // Atualizar info do utilizador no header

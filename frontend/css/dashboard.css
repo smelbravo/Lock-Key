@@ -9,8 +9,8 @@
   height: 100vh;
   height: 100dvh; /* dvh exclui barra de bookmarks do Firefox */
   max-height: 100dvh;
-  overflow: hidden; /* evita scrollbar horizontal causada pela sidebar */
   transition: grid-template-columns 0.3s ease;
+  /* NÃO usar overflow:hidden aqui — isso impede o dropdown de aparecer */
 }
 .app-layout.sidebar-collapsed { grid-template-columns: var(--sidebar-collapsed) 1fr; }
 
@@ -26,6 +26,7 @@
   top: 0;
   z-index: var(--z-sticky);
   gap: var(--space-4);
+  overflow: visible; /* permitir que o dropdown apareça abaixo do header */
 }
 
 .header-title { font-size: var(--font-size-lg); font-weight: 700; }
