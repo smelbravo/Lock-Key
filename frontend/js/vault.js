@@ -1,5 +1,5 @@
 /**
- * Lock & Key - Gestão do Cofre de Passwords
+ * Lock & Key - Gestão do cofre de palavras-passe
  * Carrega, desencripta, mostra e gere as entradas do cofre.
  */
 
@@ -139,7 +139,7 @@ function renderEntryRow(entry) {
         <button class="btn btn-icon btn-ghost btn-sm copy-user-btn" data-uuid="${entry.uuid}" data-tooltip="Copiar utilizador">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </button>
-        <button class="btn btn-icon btn-ghost btn-sm copy-pass-btn" data-uuid="${entry.uuid}" data-tooltip="Copiar password">
+        <button class="btn btn-icon btn-ghost btn-sm copy-pass-btn" data-uuid="${entry.uuid}" data-tooltip="Copiar palavra-passe">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </button>
         <button class="btn btn-icon btn-ghost btn-sm edit-entry-btn" data-uuid="${entry.uuid}" data-tooltip="Editar">
@@ -173,7 +173,7 @@ function renderEntryCard(entry) {
       <div class="vault-card-footer">
         <div class="strength-dot s${strength.score}" style="width:10px;height:10px" data-tooltip="${strength.label}"></div>
         <div style="display:flex;gap:4px">
-          <button class="btn btn-icon btn-ghost btn-sm copy-pass-btn" data-uuid="${entry.uuid}" data-tooltip="Copiar password">
+          <button class="btn btn-icon btn-ghost btn-sm copy-pass-btn" data-uuid="${entry.uuid}" data-tooltip="Copiar palavra-passe">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </button>
           <button class="btn btn-icon btn-ghost btn-sm edit-entry-btn" data-uuid="${entry.uuid}" data-tooltip="Editar">
@@ -204,13 +204,13 @@ function attachEntryEvents() {
     });
   });
 
-  // Copiar password
+  // Copiar palavra-passe
   document.querySelectorAll('.copy-pass-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const entry = VaultState.entries.find(e => e.uuid === btn.dataset.uuid);
       if (entry?.password) {
-        await LKUtils.copyToClipboard(entry.password, 'Password copiada!');
+        await LKUtils.copyToClipboard(entry.password, 'Palavra-passe copiada!');
         // Registar uso (não bloqueia se falhar)
         LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true }).catch(() => {});
       }
@@ -346,7 +346,7 @@ function showEntryDetail(uuid) {
         </div>
       </div>` : ''}
       <div class="detail-field">
-        <div class="detail-field-label">Password</div>
+        <div class="detail-field-label">Palavra-passe</div>
         <div class="detail-field-value password" id="detail-pass-field">
           <span class="value-text" id="detail-pass-text">••••••••••••</span>
           <button class="btn btn-icon btn-ghost btn-sm" id="toggle-detail-pass" data-tooltip="Mostrar">
@@ -384,12 +384,12 @@ function showEntryDetail(uuid) {
     </div>
   `;
 
-  // Toggle mostrar/ocultar password no painel
+  // Toggle mostrar/ocultar palavra-passe no painel
   const toggleBtn = document.getElementById('toggle-detail-pass');
   const copyBtn   = document.getElementById('copy-detail-pass');
   const passText  = document.getElementById('detail-pass-text');
 
-  // Respeita a preferência "ocultar passwords por defeito" (definições)
+  // Respeita a preferência «ocultar palavras-passe por defeito» (definições)
   const hideByDefault = localStorage.getItem('lk_hide_passwords') !== '0';
   let passwordVisible = !hideByDefault;
   if (passwordVisible) {
@@ -409,10 +409,10 @@ function showEntryDetail(uuid) {
     });
   }
 
-  // Copiar password (usa listener real em vez de onclick inline com password no HTML)
+  // Copiar palavra-passe (listener dedicado; evita expor o valor no HTML)
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
-      LKUtils.copyToClipboard(entry.password || '', 'Password copiada!');
+      LKUtils.copyToClipboard(entry.password || '', 'Palavra-passe copiada!');
       LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true }).catch(() => {});
     });
   }
@@ -480,7 +480,7 @@ function openDeleteModal(uuid) {
 }
 
 // ============================================================
-// GERADOR DE PASSWORDS
+// GERADOR DE PALAVRAS-PASSE
 // ============================================================
 
 function initPasswordGenerator() {
@@ -495,7 +495,7 @@ function initPasswordGenerator() {
       passInput.value = password;
       passInput.type = 'text';
       updateModalStrength(password);
-      LKToast.info('Password gerada!', 2000);
+      LKToast.info('Palavra-passe gerada!', 2000);
     });
   }
 
@@ -579,7 +579,7 @@ function initVaultEvents() {
     if (e.target === e.currentTarget) closeEntryModal();
   });
 
-  // Toggle password no modal
+  // Toggle visibilidade no campo do modal
   document.getElementById('toggle-entry-pass')?.addEventListener('click', () => {
     const input = document.getElementById('entry-password');
     if (input) input.type = input.type === 'password' ? 'text' : 'password';
@@ -621,7 +621,7 @@ async function saveEntry() {
   const password = document.getElementById('entry-password').value;
 
   if (!title || !password) {
-    LKToast.error('Título e password são obrigatórios.');
+    LKToast.error('Título e palavra-passe são obrigatórios.');
     return;
   }
 

@@ -1,5 +1,5 @@
 /**
- * Lock & Key - Gerador de Passwords
+ * Lock & Key - Gerador de palavras-passe
  */
 
 'use strict';
@@ -113,7 +113,7 @@ function generatePassword() {
 async function copyPassword() {
   if (!GenState.password) return;
   await LKUtils.copyToClipboard(GenState.password);
-  LKToast.success('Password copiada!');
+  LKToast.success('Palavra-passe copiada!');
 }
 
 function renderHistory() {
@@ -121,7 +121,7 @@ function renderHistory() {
   if (!list) return;
 
   if (!GenState.history.length) {
-    list.innerHTML = '<li style="color:var(--text-secondary);font-size:.875rem;padding:.5rem 0">Nenhuma password gerada ainda.</li>';
+    list.innerHTML = '<li style="color:var(--text-secondary);font-size:.875rem;padding:.5rem 0">Nenhuma palavra-passe gerada ainda.</li>';
     return;
   }
 

@@ -352,11 +352,11 @@ const LKCrypto = (() => {
   }
 
   // ============================================================
-  // AVALIAÇÃO DE FORÇA DE PASSWORD
+  // AVALIAÇÃO DE FORÇA DA PALAVRA-PASSE
   // ============================================================
 
   /**
-   * Avalia a força de uma password (0-4).
+   * Avalia a força de uma palavra-passe (0-4).
    * Baseado em critérios de comprimento, diversidade e entropia.
    *
    * @param {string} password
@@ -411,7 +411,7 @@ const LKCrypto = (() => {
   // ============================================================
 
   /**
-   * Gera uma password aleatória criptograficamente segura.
+   * Gera uma palavra-passe aleatória criptograficamente segura.
    *
    * @param {Object} options
    * @param {number}  options.length     - Comprimento (padrão: 20)
