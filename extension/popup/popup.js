@@ -361,7 +361,7 @@ function renderEntries() {
               <circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
-          <div class="action-btn copy-pass-btn" data-uuid="${entry.uuid}" title="Copiar palavra-passe">
+          <div class="action-btn copy-pass-btn" data-uuid="${entry.uuid}" title="Copiar password">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -394,12 +394,12 @@ function attachEntryEvents() {
     });
   });
 
-  // Copiar palavra-passe
+  // Copiar password
   document.querySelectorAll('.copy-pass-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const entry = State.filteredEntries.find(e => e.uuid === btn.dataset.uuid);
-      if (entry?.password) copyToClipboard(entry.password, 'Palavra-passe copiada!');
+      if (entry?.password) copyToClipboard(entry.password, 'Password copiada!');
     });
   });
 }

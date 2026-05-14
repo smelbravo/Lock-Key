@@ -20,7 +20,7 @@ Response::requireMethod('GET', 'POST', 'PATCH', 'DELETE');
 $user = AuthMiddleware::require();
 
 if (!in_array($user['role'], ['admin', 'admin_master'], true)) {
-    Response::forbidden('Acesso restrito a administradores.');
+    Response::forbidden('Acesso restrito a Admins.');
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -129,7 +129,7 @@ if ($method === 'GET') {
 // ============================================================
 if ($method === 'POST') {
     if ($user['role'] !== 'admin_master') {
-        Response::forbidden('Apenas o Admin Master pode criar administradores.');
+        Response::forbidden('Apenas o Admin Master pode criar Admins.');
     }
 
     $body = Response::getJsonBody();
@@ -204,7 +204,7 @@ if ($method === 'PATCH') {
 
     // Admins não podem modificar outros admins / admin_master
     if ($user['role'] === 'admin' && in_array($targetUser['role'], ['admin', 'admin_master'], true)) {
-        Response::forbidden('Sem permissão para modificar outros administradores.');
+        Response::forbidden('Sem permissão para modificar outros Admins.');
     }
     // Ninguém pode rebaixar o admin_master (excepto ele próprio)
     if ($targetUser['role'] === 'admin_master' && (int) $user['id'] !== $target && $user['role'] !== 'admin_master') {
@@ -299,7 +299,7 @@ if ($method === 'DELETE') {
     } else {
         Database::execute(
             "UPDATE users SET status = 'banned', suspended_reason = ? WHERE id = ?",
-            [sanitize($body['reason'] ?? 'Conta suspensa por administrador.'), $target]
+            [sanitize($body['reason'] ?? 'Conta suspensa por Admin.'), $target]
         );
         Database::execute('UPDATE sessions SET is_revoked = 1 WHERE user_id = ?', [$target]);
         $action = 'Utilizador suspenso com sucesso.';

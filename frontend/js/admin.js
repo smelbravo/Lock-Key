@@ -272,10 +272,10 @@ function switchSection(name) {
 
     // Título da página
     const titles = {
-        overview:     ['Visão Geral',        'Painel de Administração'],
+        overview:     ['Visão Geral',        'Painel Admin'],
         users:        ['Utilizadores',        'Gestão de contas'],
         audit:        ['Audit Log',           'Registo de eventos de segurança'],
-        'create-admin':['Criar Administrador','Apenas Admin Master'],
+        'create-admin':['Criar Admin','Apenas Admin Master'],
     };
     const [title, sub] = titles[name] ?? ['Admin', ''];
     document.getElementById('pageTitle').textContent    = title;
@@ -498,7 +498,7 @@ async function openUserModal(userId) {
                 <div class="detail-item"><label>Conta criada</label><span>${LKUtils.formatDate(u.created_at)}</span></div>
                 <div class="detail-item"><label>Último login</label><span>${u.last_login ? LKUtils.formatDate(u.last_login) : '—'}</span></div>
                 <div class="detail-item"><label>Último IP</label><span style="font-family:monospace">${u.last_login_ip ?? '—'}</span></div>
-                <div class="detail-item"><label>Palavras-passe</label><span>${u.vault_count}</span></div>
+                <div class="detail-item"><label>Passwords</label><span>${u.vault_count}</span></div>
                 <div class="detail-item"><label>Notas</label><span>${u.notes_count}</span></div>
                 <div class="detail-item"><label>Sessões ativas</label><span>${u.active_sessions}</span></div>
                 <div class="detail-item"><label>Email verificado</label><span>${u.email_verified ? '✅ Sim' : '❌ Não'}</span></div>
@@ -571,7 +571,7 @@ async function confirmSuspend() {
     const { suspendTarget, suspendAction } = AdminState;
     if (!suspendTarget) return;
 
-    const reason  = document.getElementById('suspendReason').value.trim() || 'Conta suspensa por administrador.';
+    const reason  = document.getElementById('suspendReason').value.trim() || 'Conta suspensa por Admin.';
     const newStatus = suspendAction === 'ban' ? 'banned' : 'suspended';
 
     try {

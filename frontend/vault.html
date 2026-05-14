@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cofre de palavras-passe — Lock & Key</title>
+  <title>Cofre de passwords — Lock & Key</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -24,16 +24,16 @@
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
       <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Dashboard</span></a>
-      <a href="vault.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Cofre de palavras-passe</span><span class="nav-badge" id="vault-count">0</span></a>
+      <a href="vault.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Cofre de passwords</span><span class="nav-badge" id="vault-count">0</span></a>
       <a href="notes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notas Seguras</span></a>
       <div class="sidebar-section-label">Ferramentas</div>
-      <a href="generator.html" class="nav-item" id="generator-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span>Gerador de palavras-passe</span></a>
+      <a href="generator.html" class="nav-item" id="generator-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span>Gerador de passwords</span></a>
       <!-- Visível apenas para admin / admin_master (controlado por JS) -->
       <a href="admin.html" class="nav-item admin-nav-link" id="adminNavLink" style="display:none" data-page="admin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 1l3 6 6 1-4.5 4 1 6L12 15l-5.5 3 1-6L3 8l6-1z"/>
         </svg>
-        <span>Painel de administração</span>
+        <span>Painel Admin</span>
       </a>
 
       <div class="sidebar-section-label">Conta</div>
@@ -54,7 +54,7 @@
     </button>
     <div class="header-search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" class="input" placeholder="Pesquisar palavras-passe... (Ctrl+K)" id="global-search">
+      <input type="text" class="input" placeholder="Pesquisar passwords... (Ctrl+K)" id="global-search">
     </div>
     <div class="header-spacer"></div>
     <div class="header-actions">
@@ -84,7 +84,7 @@
     <div style="flex:1;min-width:0">
       <div class="page-header">
         <div>
-          <h1 class="page-title">Cofre de palavras-passe</h1>
+          <h1 class="page-title">Cofre de passwords</h1>
           <p class="page-subtitle" id="entries-count-label">A carregar...</p>
         </div>
         <div class="page-actions">
@@ -128,10 +128,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </div>
           <h3 class="empty-state-title">Cofre vazio</h3>
-          <p class="empty-state-desc">Ainda não tens palavras-passe guardadas. Adiciona a primeira entrada!</p>
+          <p class="empty-state-desc">Ainda não tens passwords guardadas. Adiciona a primeira entrada!</p>
           <button class="btn btn-primary" id="empty-add-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Adicionar palavra-passe
+            Adicionar password
           </button>
         </div>
         <div class="vault-list" id="vault-list"></div>
@@ -172,9 +172,9 @@
           <input type="text" id="entry-username" class="input" placeholder="utilizador@exemplo.com" autocomplete="off">
         </div>
         <div class="form-group">
-          <label class="form-label">Palavra-passe *</label>
+          <label class="form-label">Password *</label>
           <div class="input-group">
-            <input type="password" id="entry-password" class="input" placeholder="Introduz a palavra-passe" autocomplete="new-password" required>
+            <input type="password" id="entry-password" class="input" placeholder="Introduz a password" autocomplete="new-password" required>
             <button type="button" class="input-addon" id="toggle-entry-pass">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
@@ -188,7 +188,7 @@
             </div>
             <div style="font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;margin-top:2px">
               <span id="modal-strength-text">—</span>
-              <button type="button" id="generate-password-btn" style="background:none;border:none;color:var(--accent-primary);font-size:11px;cursor:pointer;font-family:inherit">Gerar palavra-passe forte</button>
+              <button type="button" id="generate-password-btn" style="background:none;border:none;color:var(--accent-primary);font-size:11px;cursor:pointer;font-family:inherit">Gerar password forte</button>
             </div>
           </div>
         </div>

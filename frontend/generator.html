@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de palavras-passe – Lock &amp; Key</title>
+  <title>Gerador de passwords – Lock &amp; Key</title>
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/dashboard.css">
@@ -70,7 +70,7 @@
       </a>
       <a href="vault.html" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Cofre de palavras-passe</span>
+        <span>Cofre de passwords</span>
       </a>
       <a href="notes.html" class="nav-item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -79,11 +79,11 @@
       <div class="sidebar-section-label">Ferramentas</div>
       <a href="generator.html" class="nav-item active" id="generator-nav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-        <span>Gerador de palavras-passe</span>
+        <span>Gerador de passwords</span>
       </a>
       <a href="admin.html" class="nav-item admin-nav-link" id="adminNavLink" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1l3 6 6 1-4.5 4 1 6L12 15l-5.5 3 1-6L3 8l6-1z"/></svg>
-        <span>Painel de administração</span>
+        <span>Painel Admin</span>
       </a>
       <div class="sidebar-section-label">Conta</div>
       <a href="settings.html" class="nav-item">
@@ -140,17 +140,17 @@
 
       <div class="page-header" style="margin-bottom:1.5rem">
         <div>
-          <h1 class="page-title">Gerador de palavras-passe</h1>
-          <p class="page-subtitle">Cria palavras-passe seguras e aleatórias</p>
+          <h1 class="page-title">Gerador de passwords</h1>
+          <p class="page-subtitle">Cria passwords seguras e aleatórias</p>
         </div>
       </div>
 
       <!-- Card principal do gerador -->
       <div class="gen-card">
-        <!-- Saída da palavra-passe -->
+        <!-- Saída da password -->
         <div class="gen-output-wrapper">
-          <div class="gen-output" id="gen-output">Clica em «Gerar» para criar uma palavra-passe</div>
-          <button class="gen-copy-overlay" id="gen-copy-btn" title="Copiar palavra-passe">
+          <div class="gen-output" id="gen-output">Clica em «Gerar» para criar uma password</div>
+          <button class="gen-copy-overlay" id="gen-copy-btn" title="Copiar password">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
         </div>
@@ -196,7 +196,7 @@
         <div class="gen-actions">
           <button class="btn btn-primary" id="gen-generate-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Gerar palavra-passe
+            Gerar password
           </button>
           <button class="btn btn-secondary" id="gen-copy-btn2">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -212,7 +212,7 @@
           <button class="btn btn-ghost" id="gen-clear-history" style="padding:.3rem .7rem;font-size:.8rem">Limpar</button>
         </div>
         <ul class="history-list" id="gen-history-list">
-          <li style="color:var(--text-muted);font-size:var(--font-size-sm);padding:.5rem 0">Nenhuma palavra-passe gerada ainda.</li>
+          <li style="color:var(--text-muted);font-size:var(--font-size-sm);padding:.5rem 0">Nenhuma password gerada ainda.</li>
         </ul>
       </div>
 

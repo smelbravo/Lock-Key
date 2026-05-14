@@ -16,7 +16,7 @@ Lock&Key/
 │   │   ├── vault/              # Gestão do cofre (CRUD + exportar)
 │   │   ├── notes/              # Notas seguras (CRUD)
 │   │   ├── user/               # Perfil, alterar senha, eliminar conta
-│   │   └── admin/              # Endpoints do painel de administração
+│   │   └── admin/              # Endpoints do painel Admin
 │   ├── config/                 # Configuração e ligação à BD
 │   ├── helpers/                # JWT, encriptação, respostas
 │   ├── middleware/             # Autenticação JWT, rate limiting
@@ -45,13 +45,13 @@ Lock&Key/
     ├── notes.html              # Notas seguras
     ├── generator.html          # Gerador de passwords (página dedicada)
     ├── settings.html           # Definições da conta
-    ├── admin.html              # Painel de Administração (só admins)
+    ├── admin.html              # Painel Admin (só Admins)
     ├── css/
     │   ├── variables.css       # Tokens de design global
     │   ├── main.css            # Estilos globais e páginas públicas
     │   ├── auth.css            # Estilos de login/registo
     │   ├── dashboard.css       # Layout do dashboard (grid, sidebar, header)
-    │   └── admin.css           # Estilos do painel de administração
+    │   └── admin.css           # Estilos do painel Admin
     └── js/
         ├── crypto.js           # Criptografia client-side (PBKDF2, AES-GCM)
         ├── api.js              # Comunicação com a API REST
@@ -62,7 +62,7 @@ Lock&Key/
         ├── notes.js            # Gestão de notas seguras
         ├── generator.js        # Lógica do gerador de passwords
         ├── settings.js         # Definições da conta
-        └── admin.js            # Painel de administração
+        └── admin.js            # Painel Admin
 ```
 
 ---
@@ -198,7 +198,7 @@ http://localhost/Lock%26Key/frontend/
 
 ---
 
-## 🛡️ Painel de Administração
+## 🛡️ Painel Admin
 
 Acessível em `/frontend/admin.html` — **apenas para utilizadores com role `admin` ou `admin_master`**.
 

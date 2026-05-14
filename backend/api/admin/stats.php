@@ -15,7 +15,7 @@ Response::requireMethod('GET');
 $user = AuthMiddleware::require();
 
 if (!in_array($user['role'], ['admin', 'admin_master'], true)) {
-    Response::forbidden('Acesso restrito a administradores.');
+    Response::forbidden('Acesso restrito a Admins.');
 }
 
 // Contagens gerais

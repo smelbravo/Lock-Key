@@ -242,7 +242,7 @@ $existingAdmin = $stmt->fetch();
 <div class="card">
     <div class="logo">🔐</div>
     <h1>Lock & Key — Setup Admin</h1>
-    <p class="sub">Criação única da conta administrador master</p>
+    <p class="sub">Criação única da conta Admin Master</p>
 
     <?php if ($message): ?>
         <div class="alert <?= $success ? 'alert-success' : 'alert-error' ?>">

@@ -460,7 +460,7 @@
 .detail-field-value.password.hidden .value-text { letter-spacing: 0.3em; font-family: var(--font-mono); }
 .detail-footer { padding: var(--space-5); border-top: 1px solid var(--border-color); display: flex; gap: var(--space-3); }
 
-/* Gerador de palavras-passe */
+/* Gerador de passwords */
 .generator-panel {
   padding: var(--space-6);
 }
