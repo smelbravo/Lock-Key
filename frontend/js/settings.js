@@ -20,8 +20,10 @@ function initSettingsNav() {
       navItems.forEach(i => i.classList.remove('active'));
       item.classList.add('active');
 
-      // Esconder todos os painéis
-      document.querySelectorAll('[id^="settings-"]').forEach(el => el.style.display = 'none');
+      // Esconder todos os painéis de secção (classes dedicadas — evita selectors frágeis em id)
+      document.querySelectorAll('.settings-grid .settings-section').forEach((el) => {
+        el.style.display = 'none';
+      });
 
       // Mostrar painel selecionado
       const section = document.getElementById(`settings-${item.dataset.settings}`);

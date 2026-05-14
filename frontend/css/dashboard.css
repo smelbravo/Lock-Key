@@ -224,6 +224,10 @@
   cursor: pointer;
   transition: var(--transition-fast);
   width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
 }
 .collapse-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
 .collapse-btn svg { flex-shrink: 0; transition: transform 0.3s; }
