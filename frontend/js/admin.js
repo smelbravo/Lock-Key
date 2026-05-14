@@ -683,7 +683,9 @@ async function handleCreateAdmin(e) {
         const saltBytes = crypto.getRandomValues(new Uint8Array(32));
         const vaultSalt = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
 
-        const { authKey } = await LKCrypto.deriveKeys(password, vaultSalt);
+        // IMPORTANTE: deriveKeys precisa de (password, email, salt, iterations)
+        // O email é usado como parte do material de salt PBKDF2 para coincidir com o login
+        const { authKey } = await LKCrypto.deriveKeys(password, email.toLowerCase(), vaultSalt, 200000);
 
         const res = await LKApi.request('POST', '/admin/users.php', {
             username,
@@ -758,10 +760,19 @@ function renderPagination(containerId, pagination, onPage) {
     const { page, pages, total } = pagination;
     if (pages <= 1) { el.innerHTML = `<span>${total} resultado(s)</span>`; return; }
 
-    const prev = page > 1    ? `<button class="page-btn" onclick="(${onPage})(${page - 1})">← Anterior</button>` : '';
-    const next = page < pages ? `<button class="page-btn" onclick="(${onPage})(${page + 1})">Seguinte →</button>` : '';
+    el.innerHTML = `
+        ${page > 1    ? `<button class="page-btn" data-page="${page - 1}">← Anterior</button>` : ''}
+        <span>Página ${page} de ${pages} (${total} total)</span>
+        ${page < pages ? `<button class="page-btn" data-page="${page + 1}">Seguinte →</button>` : ''}
+    `;
 
-    el.innerHTML = `${prev}<span>Página ${page} de ${pages} (${total} total)</span>${next}`;
+    // Usar event listeners reais (mais fiável que onclick com stringificação)
+    el.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const p = parseInt(btn.dataset.page, 10);
+            if (!isNaN(p)) onPage(p);
+        });
+    });
 }
 
 // ============================================================

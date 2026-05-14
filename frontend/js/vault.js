@@ -21,9 +21,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initDashboardLayout();
   LKAutoLock.init();
+
+  // Ler ?filter=favourite|weak da URL (vindo do dashboard "Ver todos →")
+  const urlParams = new URLSearchParams(window.location.search);
+  const filterFromUrl = urlParams.get('filter');
+  if (filterFromUrl && ['favourite', 'weak', 'all'].includes(filterFromUrl)) {
+    VaultState.filter = filterFromUrl;
+  }
+
   await loadVaultEntries();
   initVaultEvents();
   initPasswordGenerator();
+
+  // Ativar a tab/filtro correspondente após carregamento
+  if (VaultState.filter !== 'all') {
+    const tab = document.querySelector(`[data-filter="${VaultState.filter}"]`);
+    if (tab) {
+      document.querySelectorAll('[data-filter]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    }
+  }
 });
 
 // ============================================================

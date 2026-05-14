@@ -95,6 +95,10 @@ const State = {
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Pedir ao background para limpar a badge (browserAction.onClicked não dispara
+  // quando há default_popup definido).
+  try { browser.runtime.sendMessage({ type: 'CLEAR_BADGE' }); } catch {}
+
   // Verificar sessão guardada
   const session = await getStoredSession();
 
@@ -531,8 +535,21 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
     opts.body = JSON.stringify(body);
   }
 
-  const res  = await fetch(`${API_BASE}${endpoint}`, opts);
-  const data = await res.json();
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${endpoint}`, opts);
+  } catch (err) {
+    throw new Error('Sem conexão com o servidor. Verifica se o XAMPP está a correr.');
+  }
+
+  // Tentar parsear JSON; caso o servidor devolva HTML/erro genérico, dar mensagem útil
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    if (!res.ok) throw new Error(`Erro do servidor (${res.status}).`);
+    data = {};
+  }
 
   if (!res.ok) throw new Error(data.message || `Erro ${res.status}`);
   return data;
@@ -562,7 +579,7 @@ function copyToClipboard(text, msg = 'Copiado!') {
 function showNotification(message) {
   browser.notifications.create({
     type: 'basic',
-    iconUrl: '../assets/icon-48.png',
+    iconUrl: browser.runtime.getURL('assets/icon.svg'),
     title: 'Lock & Key',
     message,
   });

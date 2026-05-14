@@ -15,9 +15,16 @@ require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
 Response::requireMethod('POST');
 
-$user  = AuthMiddleware::require();
-$body  = Response::getJsonBody();
-$token = substr($_SERVER['HTTP_AUTHORIZATION'] ?? '', 7);
+$user = AuthMiddleware::require();
+$body = Response::getJsonBody();
+
+// Extrair token com a mesma lógica robusta do middleware (suporta getallheaders)
+$authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+if (empty($authHeader) && function_exists('getallheaders')) {
+    $headers    = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+}
+$token = str_starts_with($authHeader, 'Bearer ') ? substr($authHeader, 7) : '';
 
 $allSessions = (bool) ($body['all_sessions'] ?? false);
 

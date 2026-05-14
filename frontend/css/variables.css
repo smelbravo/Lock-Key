@@ -102,6 +102,20 @@
   --z-modal:     400;
   --z-toast:     500;
   --z-tooltip:   600;
+
+  /* === Aliases para compatibilidade (mapeiam para tokens existentes) === */
+  --primary:        var(--accent-primary);
+  --primary-hover:  var(--accent-hover);
+  --primary-active: var(--accent-active);
+  --error:          var(--danger);
+  --error-bg:       var(--danger-bg);
+  --bg-card:        var(--bg-secondary);
+  --bg-input:       var(--bg-tertiary);
+  --border:         var(--border-color);
+  --radius:         var(--border-radius);
+  --radius-sm:      var(--border-radius-sm);
+  --radius-lg:      var(--border-radius-lg);
+  --accent-blue:    var(--accent-primary);
 }
 
 /* Tema Claro (ativado via classe .light-mode no body) */

@@ -114,14 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['token'] ?? '') === SETUP_T
             'threads'     => 3,
         ]);
 
-        // Gerar UUID
-        $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-        );
+        // Gerar UUID v4 com random_bytes (criptograficamente seguro)
+        $bytes    = random_bytes(16);
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40); // version 4
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80); // variant 10xx
+        $uuid     = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
 
         try {
             $stmt = $pdo->prepare("

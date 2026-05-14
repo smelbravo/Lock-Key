@@ -407,33 +407,44 @@ const LKCrypto = (() => {
    *
    * @param {Object} options
    * @param {number}  options.length     - Comprimento (padrão: 20)
-   * @param {boolean} options.uppercase  - Incluir maiúsculas
-   * @param {boolean} options.lowercase  - Incluir minúsculas
-   * @param {boolean} options.digits     - Incluir números
-   * @param {boolean} options.symbols    - Incluir símbolos
+   * @param {boolean} options.uppercase         - Incluir maiúsculas
+   * @param {boolean} options.lowercase         - Incluir minúsculas
+   * @param {boolean} options.digits|numbers    - Incluir números (aceita ambos os nomes)
+   * @param {boolean} options.symbols           - Incluir símbolos
+   * @param {boolean} options.excludeAmbiguous  - Excluir caracteres ambíguos (0O1lI)
    * @returns {string}
    */
-  function generatePassword({
-    length    = 20,
-    uppercase = true,
-    lowercase = true,
-    digits    = true,
-    symbols   = true,
-  } = {}) {
-    const sets = {
-      uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-      lowercase: 'abcdefghijklmnopqrstuvwxyz',
-      digits:    '0123456789',
-      symbols:   '!@#$%^&*()-_=+[]{}|;:,.<>?',
-    };
+  function generatePassword(opts = {}) {
+    const {
+      length           = 20,
+      uppercase        = true,
+      lowercase        = true,
+      symbols          = true,
+      excludeAmbiguous = false,
+    } = opts;
+    // Aceitar tanto `digits` como `numbers` para evitar erros de naming
+    const useDigits = opts.digits ?? opts.numbers ?? true;
+
+    let upperSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let lowerSet = 'abcdefghijklmnopqrstuvwxyz';
+    let digitSet = '0123456789';
+    let symSet   = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+
+    if (excludeAmbiguous) {
+      const ambiguous = /[0O1lI|`'"{}\[\]()<>;:,.]/g;
+      upperSet = upperSet.replace(ambiguous, '');
+      lowerSet = lowerSet.replace(ambiguous, '');
+      digitSet = digitSet.replace(ambiguous, '');
+      symSet   = symSet.replace(ambiguous, '');
+    }
 
     let charset = '';
     const required = [];
 
-    if (uppercase) { charset += sets.uppercase; required.push(sets.uppercase); }
-    if (lowercase) { charset += sets.lowercase; required.push(sets.lowercase); }
-    if (digits)    { charset += sets.digits;    required.push(sets.digits); }
-    if (symbols)   { charset += sets.symbols;   required.push(sets.symbols); }
+    if (uppercase) { charset += upperSet; required.push(upperSet); }
+    if (lowercase) { charset += lowerSet; required.push(lowerSet); }
+    if (useDigits) { charset += digitSet; required.push(digitSet); }
+    if (symbols)   { charset += symSet;   required.push(symSet); }
 
     if (!charset) return '';
 

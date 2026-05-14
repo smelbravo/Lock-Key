@@ -1,32 +1,31 @@
 <?php
 /**
  * Lock & Key - API Admin: Estatísticas do Sistema
- * 
+ *
  * GET /admin/stats.php → métricas globais para o painel admin
- * 
+ *
  * Acesso: admin | admin_master
  */
 
-define('LK_APP', true);
+declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
-Response::requireMethod(['GET']);
-$user = Auth::require();
+Response::requireMethod('GET');
 
-if (!in_array($user['role'], ['admin', 'admin_master'])) {
+$user = AuthMiddleware::require();
+
+if (!in_array($user['role'], ['admin', 'admin_master'], true)) {
     Response::forbidden('Acesso restrito a administradores.');
 }
 
-$db = Database::getInstance();
-
 // Contagens gerais
-$totals = $db->fetchOne("
+$totals = Database::fetchOne("
     SELECT
         (SELECT COUNT(*) FROM users WHERE role = 'user')         AS total_users,
         (SELECT COUNT(*) FROM users WHERE role = 'admin')        AS total_admins,
         (SELECT COUNT(*) FROM users WHERE role = 'admin_master') AS total_masters,
         (SELECT COUNT(*) FROM users WHERE status = 'active')     AS active_users,
-        (SELECT COUNT(*) FROM users WHERE status = 'suspended' OR status = 'banned') AS suspended_users,
+        (SELECT COUNT(*) FROM users WHERE status IN ('suspended','banned')) AS suspended_users,
         (SELECT COUNT(*) FROM users WHERE plan = 'free')         AS plan_free,
         (SELECT COUNT(*) FROM users WHERE plan = 'pro')          AS plan_pro,
         (SELECT COUNT(*) FROM users WHERE plan = 'unlimited')    AS plan_unlimited,
@@ -36,7 +35,7 @@ $totals = $db->fetchOne("
 ");
 
 // Novos registos nos últimos 30 dias (por dia)
-$registrations = $db->fetchAll("
+$registrations = Database::fetchAll("
     SELECT DATE(created_at) AS day, COUNT(*) AS count
     FROM users
     WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
@@ -45,7 +44,7 @@ $registrations = $db->fetchAll("
 ");
 
 // Últimos 10 logins
-$recentLogins = $db->fetchAll("
+$recentLogins = Database::fetchAll("
     SELECT username, email, last_login, last_login_ip, role, plan, status
     FROM users
     WHERE last_login IS NOT NULL
@@ -54,7 +53,7 @@ $recentLogins = $db->fetchAll("
 ");
 
 // Últimas entradas do audit log
-$auditEntries = $db->fetchAll("
+$auditEntries = Database::fetchAll("
     SELECT a.action, a.ip_address, a.created_at, a.details,
            u.username, u.email
     FROM audit_log a
@@ -64,12 +63,12 @@ $auditEntries = $db->fetchAll("
 ");
 
 // Top 5 utilizadores com mais entradas
-$topUsers = $db->fetchAll("
+$topUsers = Database::fetchAll("
     SELECT u.username, u.email, u.plan, u.role,
            COUNT(v.id) AS vault_count
     FROM users u
     LEFT JOIN vault_entries v ON v.user_id = u.id
-    GROUP BY u.id
+    GROUP BY u.id, u.username, u.email, u.plan, u.role
     ORDER BY vault_count DESC
     LIMIT 5
 ");
@@ -81,4 +80,3 @@ Response::success([
     'audit_log'     => $auditEntries,
     'top_users'     => $topUsers,
 ]);
-

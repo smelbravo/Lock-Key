@@ -275,6 +275,27 @@ const LKApi = (() => {
   }
 
   // ============================================================
+  // REQUEST GENÉRICO (para Admin Panel e outros consumidores)
+  // ============================================================
+
+  /**
+   * Envia uma requisição autenticada genérica.
+   * Útil para endpoints novos (ex: /admin/*) que não têm wrapper específico.
+   * Devolve diretamente o JSON parseado (já validado pelo `request`).
+   *
+   * @param {string} method   - GET, POST, PATCH, DELETE...
+   * @param {string} endpoint - Caminho do endpoint (ex: '/admin/users.php')
+   * @param {Object|null} body
+   */
+  async function apiRequest(method, endpoint, body = null) {
+    const opts = { method: method.toUpperCase() };
+    if (body !== null && body !== undefined && opts.method !== 'GET') {
+      opts.body = JSON.stringify(body);
+    }
+    return request(endpoint, opts);
+  }
+
+  // ============================================================
   // EXPORTAR API PÚBLICA
   // ============================================================
 
@@ -299,6 +320,7 @@ const LKApi = (() => {
     getStoredUser,
     clearTokens,
     refreshAccessToken,
+    request: apiRequest,
     BASE_URL,
   };
 })();

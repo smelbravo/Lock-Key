@@ -120,9 +120,56 @@ function initSettingsEvents() {
     });
   }
 
-  // Guardar preferências
+  // Carregar preferências guardadas
+  const autoLockPref = document.getElementById('pref-auto-lock');
+  if (autoLockPref) {
+    autoLockPref.checked = localStorage.getItem('lk_auto_lock') !== '0';
+    autoLockPref.addEventListener('change', () => {
+      localStorage.setItem('lk_auto_lock', autoLockPref.checked ? '1' : '0');
+    });
+  }
+  const hidePref = document.getElementById('pref-hide-passwords');
+  if (hidePref) {
+    hidePref.checked = localStorage.getItem('lk_hide_passwords') !== '0';
+    hidePref.addEventListener('change', () => {
+      localStorage.setItem('lk_hide_passwords', hidePref.checked ? '1' : '0');
+    });
+  }
+
+  // Guardar preferências (já são guardadas individualmente; aqui é só feedback)
   document.getElementById('save-prefs-btn')?.addEventListener('click', () => {
     LKToast.success('Preferências guardadas!');
+  });
+
+  // Importar cofre (.json)
+  document.getElementById('import-file')?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('Ficheiro inválido.');
+      }
+      LKToast.info('Funcionalidade de importação em desenvolvimento. O ficheiro foi validado.');
+      // TODO: importar entradas e notas re-encriptadas (precisa endpoint dedicado)
+    } catch (err) {
+      LKToast.error('Erro a ler o ficheiro: ' + err.message);
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  // Eliminar conta (apenas confirmação visual; backend ainda não implementa endpoint definitivo)
+  document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
+    const confirm1 = confirm('Tens a certeza ABSOLUTA que queres eliminar a conta? Esta ação é IRREVERSÍVEL.');
+    if (!confirm1) return;
+    const confirm2 = prompt('Para confirmar, escreve "ELIMINAR" (em maiúsculas):');
+    if (confirm2 !== 'ELIMINAR') {
+      LKToast.info('Eliminação cancelada.');
+      return;
+    }
+    LKToast.warning('A eliminação de contas pela UI ainda não está disponível. Contacta o administrador.');
   });
 }
 

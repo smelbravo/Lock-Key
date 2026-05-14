@@ -6,16 +6,14 @@
 
 'use strict';
 
-// Receber mensagens dos content scripts
+// Receber mensagens dos content scripts e popup
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'CREDENTIALS_DETECTED') {
-    // Content script detetou credenciais submetidas num formulário
     handleDetectedCredentials(message.data, sender.tab);
     return;
   }
 
   if (message.type === 'GET_ENTRIES_FOR_DOMAIN') {
-    // Content script pede entradas para autofill automático
     browser.storage.local.get('lk_session').then(data => {
       sendResponse({ session: data.lk_session });
     });
@@ -23,8 +21,17 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'SHOW_POPUP') {
-    // Content script quer abrir o popup
-    browser.browserAction.openPopup();
+    // browserAction.openPopup() exige gesto do utilizador; encapsular em try
+    try { browser.browserAction.openPopup?.(); } catch {}
+    return;
+  }
+
+  // Compensar o facto de browserAction.onClicked NÃO disparar quando há default_popup
+  if (message.type === 'CLEAR_BADGE') {
+    browser.tabs.query({ active: true, currentWindow: true }).then(tabs => {
+      const tabId = tabs[0]?.id;
+      if (tabId !== undefined) browser.browserAction.setBadgeText({ text: '', tabId });
+    });
     return;
   }
 });
@@ -46,20 +53,17 @@ async function handleDetectedCredentials(data, tab) {
   // Mostrar notificação
   browser.notifications.create('save-cred', {
     type:    'basic',
-    iconUrl: '../assets/icon-48.png',
+    iconUrl: browser.runtime.getURL('assets/icon.svg'),
     title:   'Lock & Key',
     message: `Guardar credenciais para ${domain}? Clica no ícone Lock & Key.`,
   });
 
   // Atualizar badge
-  browser.browserAction.setBadgeText({ text: '!', tabId: tab.id });
-  browser.browserAction.setBadgeBackgroundColor({ color: '#3b82f6' });
+  if (tab?.id !== undefined) {
+    browser.browserAction.setBadgeText({ text: '!', tabId: tab.id });
+    browser.browserAction.setBadgeBackgroundColor({ color: '#3b82f6' });
+  }
 }
-
-// Limpar badge ao abrir popup
-browser.browserAction.onClicked.addListener((tab) => {
-  browser.browserAction.setBadgeText({ text: '', tabId: tab.id });
-});
 
 // Limpar credenciais pendentes antigas (mais de 5 min)
 setInterval(async () => {
