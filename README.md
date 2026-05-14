@@ -15,7 +15,7 @@ Lock&Key/
 │   │   ├── auth/               # Autenticação (login, registo, logout, refresh, get_salt)
 │   │   ├── vault/              # Gestão do cofre (CRUD + exportar)
 │   │   ├── notes/              # Notas seguras (CRUD)
-│   │   ├── user/               # Perfil e alterar senha
+│   │   ├── user/               # Perfil, alterar senha, eliminar conta
 │   │   └── admin/              # Endpoints do painel de administração
 │   ├── config/                 # Configuração e ligação à BD
 │   ├── helpers/                # JWT, encriptação, respostas
@@ -90,6 +90,12 @@ PBKDF2-SHA256 (200.000 iterações) + vault_salt gerado no CLIENTE
 - **Rate limiting**: proteção contra brute force por IP e email
 - **Auto-lock**: sessão bloqueada por inatividade (30 min, configurável)
 - **Persistência de sessão**: `encryptionKey` raw bytes guardados em `sessionStorage` para sobreviver a navegação entre páginas sem pedir senha mestra
+
+### Cópia de segurança, importação e eliminação de conta
+
+- **Exportar cofre** (`GET /vault/export.php`): devolve JSON com `export_version`, `user_uuid`, `entries` e `notes` ainda encriptados (o servidor não desencripta).
+- **Importar** (página Definições): carregar o `.json` exportado; só é permitido se o campo `user_uuid` do ficheiro for o da conta com sessão iniciada — *ciphertext* de outra conta não pode ser importado. Em backups muito antigos sem `user_uuid`, é feita uma verificação de desencriptação com a chave de sessão do cofre (é preciso ter o cofre desbloqueado). Cada item importado cria **novos** registos (novos UUIDs). A importação para se atingires o limite do plano.
+- **Eliminar conta** (`POST /user/delete_account.php`): envia-se o `auth_key` (hex 64) derivado da senha mestra; remove a conta e dados associados (cascade na BD). O único utilizador `admin_master` do sistema **não** pode eliminar-se a si próprio.
 
 ---
 
@@ -292,6 +298,7 @@ Submeter em: https://addons.mozilla.org/developers/
 | GET  | `/user/profile.php` | Obter perfil (inclui role, plan, status) |
 | POST | `/user/profile.php` | Atualizar perfil |
 | POST | `/user/change_password.php` | Alterar senha mestra |
+| POST | `/user/delete_account.php` | Eliminar a própria conta (`auth_key` hex 64) |
 
 ### Admin *(requer role admin ou admin_master)*
 
