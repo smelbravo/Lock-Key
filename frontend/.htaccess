@@ -1,6 +1,9 @@
 # Lock & Key - Configuração Apache para o Frontend
 Options -Indexes
 
+# Garantir UTF-8 (evita ?? em acentos quando o Apache usa ISO-8859-1 por defeito)
+AddDefaultCharset UTF-8
+
 <IfModule mod_headers.c>
     # CSP para o frontend
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost; frame-ancestors 'none';"
