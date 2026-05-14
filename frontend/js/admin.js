@@ -134,7 +134,11 @@ function initUI(user) {
     const sidebarRoleEl = document.getElementById('sidebarRole');
     if (sidebarRoleEl) sidebarRoleEl.innerHTML = roleBadgeHTML;
     const headerBadgeEl = document.getElementById('headerRoleBadge');
-    if (headerBadgeEl) headerBadgeEl.outerHTML = roleBadgeHTML;
+    if (headerBadgeEl) {
+        // Substituir conteúdo em vez de outerHTML (que perde o id e quebra futuras atualizações)
+        headerBadgeEl.className = isMaster ? 'role-badge master' : 'role-badge admin';
+        headerBadgeEl.textContent = isMaster ? 'Admin Master' : 'Admin';
+    }
 
     // Mostrar elementos exclusivos do admin_master
     if (isMaster) {
@@ -149,13 +153,22 @@ function initUI(user) {
         });
     });
 
-    // Tema
+    // Tema (LKTheme.init regista #theme-toggle; não duplicar listener com ID errado)
     LKTheme.init();
-    document.getElementById('themeToggle')?.addEventListener('click', () => LKTheme.toggle());
 
-    // Sidebar toggle (collapse-sidebar é o novo ID, sidebarToggle o antigo)
+    // Sidebar: alinhar com initDashboardLayout — estado persistido
+    const layout = document.getElementById('app-layout');
+    if (layout && localStorage.getItem('lk_sidebar_collapsed') === '1') {
+        layout.classList.add('sidebar-collapsed');
+    }
     document.getElementById('collapse-sidebar')?.addEventListener('click', () => {
-        document.getElementById('app-layout')?.classList.toggle('sidebar-collapsed');
+        layout?.classList.toggle('sidebar-collapsed');
+        if (layout) {
+            localStorage.setItem(
+                'lk_sidebar_collapsed',
+                layout.classList.contains('sidebar-collapsed') ? '1' : '0'
+            );
+        }
     });
     document.getElementById('menuToggle')?.addEventListener('click', () => {
         document.getElementById('sidebar').classList.toggle('open');
@@ -180,7 +193,9 @@ function initUI(user) {
             e.stopPropagation();
             headerDropdown.classList.toggle('open');
         });
-        document.addEventListener('click', () => headerDropdown.classList.remove('open'));
+        document.addEventListener('click', (e) => {
+            if (!headerDropdown.contains(e.target)) headerDropdown.classList.remove('open');
+        });
     }
 
     // Pesquisa utilizadores (debounce)
