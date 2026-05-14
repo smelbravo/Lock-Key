@@ -62,6 +62,29 @@ if (!Encryption::verifyPassword($currentAuthKey, $userData['auth_key_hash'])) {
     Response::error('Senha atual incorreta.', 401);
 }
 
+// Validar arrays antes de iniciar a transação
+$entries = $body['entries'] ?? [];
+$notes   = $body['notes']   ?? [];
+
+if (!is_array($entries)) Response::error('Campo "entries" deve ser array.', 422);
+if (!is_array($notes))   Response::error('Campo "notes" deve ser array.', 422);
+
+// Limites de segurança (impedir DoS via payloads gigantes)
+if (count($entries) > 50000) Response::error('Demasiadas entradas a re-encriptar.', 422);
+if (count($notes)   > 50000) Response::error('Demasiadas notas a re-encriptar.', 422);
+
+// Helper para validar campo encriptado (base64, tamanho máximo)
+$validateEnc = function (?string $v, int $maxLen = 65535): ?string {
+    if ($v === null || $v === '') return null;
+    if (base64_decode($v, true) === false) return null;
+    if (strlen($v) > $maxLen) return null;
+    return $v;
+};
+
+$ivOk = static function (?string $iv): bool {
+    return is_string($iv) && preg_match('/^[A-Za-z0-9+\/]{16}$/', $iv) === 1;
+};
+
 try {
     Database::beginTransaction();
 
@@ -73,35 +96,45 @@ try {
     );
 
     // Re-encriptar entradas do cofre (se fornecidas)
-    $entries = $body['entries'] ?? [];
     foreach ($entries as $entry) {
-        if (empty($entry['uuid'])) continue;
+        if (!is_array($entry) || empty($entry['uuid'])) continue;
+        if (!$ivOk($entry['iv'] ?? null)) {
+            throw new \RuntimeException('IV inválido em entrada ' . ($entry['uuid'] ?? '?'));
+        }
         Database::execute(
             'UPDATE vault_entries
              SET title_enc = ?, url_enc = ?, username_enc = ?, password_enc = ?,
                  notes_enc = ?, category_enc = ?, tags_enc = ?, iv = ?, updated_at = NOW()
              WHERE uuid = ? AND user_id = ?',
             [
-                $entry['title_enc'] ?? null, $entry['url_enc'] ?? null,
-                $entry['username_enc'] ?? null, $entry['password_enc'] ?? null,
-                $entry['notes_enc'] ?? null, $entry['category_enc'] ?? null,
-                $entry['tags_enc'] ?? null, $entry['iv'] ?? null,
+                $validateEnc($entry['title_enc']    ?? null),
+                $validateEnc($entry['url_enc']      ?? null),
+                $validateEnc($entry['username_enc'] ?? null),
+                $validateEnc($entry['password_enc'] ?? null),
+                $validateEnc($entry['notes_enc']    ?? null),
+                $validateEnc($entry['category_enc'] ?? null),
+                $validateEnc($entry['tags_enc']     ?? null),
+                $entry['iv'],
                 sanitize($entry['uuid'], 36), $user['id'],
             ]
         );
     }
 
     // Re-encriptar notas (se fornecidas)
-    $notes = $body['notes'] ?? [];
     foreach ($notes as $note) {
-        if (empty($note['uuid'])) continue;
+        if (!is_array($note) || empty($note['uuid'])) continue;
+        if (!$ivOk($note['iv'] ?? null)) {
+            throw new \RuntimeException('IV inválido em nota ' . ($note['uuid'] ?? '?'));
+        }
         Database::execute(
             'UPDATE secure_notes
              SET title_enc = ?, content_enc = ?, category_enc = ?, iv = ?, updated_at = NOW()
              WHERE uuid = ? AND user_id = ?',
             [
-                $note['title_enc'] ?? null, $note['content_enc'] ?? null,
-                $note['category_enc'] ?? null, $note['iv'] ?? null,
+                $validateEnc($note['title_enc']    ?? null),
+                $validateEnc($note['content_enc']  ?? null, 1048576),
+                $validateEnc($note['category_enc'] ?? null),
+                $note['iv'],
                 sanitize($note['uuid'], 36), $user['id'],
             ]
         );

@@ -95,13 +95,25 @@ function renderRecentEntries(entries) {
           <span style="font-size:11px;color:var(--text-muted)">${LKUtils.formatDate(entry.last_used || entry.updated_at)}</span>
         </div>
         <div class="entry-actions">
-          <button class="btn btn-icon btn-ghost btn-sm" onclick="event.stopPropagation();LKUtils.copyToClipboard('${LKUtils.escapeHtml(entry.password || '')}','Password copiada!')" data-tooltip="Copiar password">
+          <button class="btn btn-icon btn-ghost btn-sm copy-pass-btn" data-uuid="${LKUtils.escapeHtml(entry.uuid || '')}" data-tooltip="Copiar password">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </button>
         </div>
       </div>
     `;
   }).join('');
+
+  // Listeners reais (mais seguros que onclick com password interpolada no HTML)
+  container.querySelectorAll('.copy-pass-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const uuid = btn.dataset.uuid;
+      const entry = entries.find(x => x.uuid === uuid);
+      if (entry?.password) {
+        await LKUtils.copyToClipboard(entry.password, 'Password copiada!');
+      }
+    });
+  });
 }
 
 function renderFavourites(entries) {
@@ -131,11 +143,22 @@ function renderFavourites(entries) {
         <div class="vault-card-username">${LKUtils.escapeHtml(entry.username || entry.url || '—')}</div>
         <div class="vault-card-footer">
           <div class="strength-dot s${strength.score}" style="width:10px;height:10px"></div>
-          <button class="btn btn-icon btn-ghost btn-sm" onclick="event.stopPropagation();LKUtils.copyToClipboard('${LKUtils.escapeHtml(entry.password || '')}','Password copiada!')" data-tooltip="Copiar">
+          <button class="btn btn-icon btn-ghost btn-sm copy-fav-btn" data-uuid="${LKUtils.escapeHtml(entry.uuid || '')}" data-tooltip="Copiar">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </button>
         </div>
       </div>
     `;
   }).join('');
+
+  container.querySelectorAll('.copy-fav-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const uuid = btn.dataset.uuid;
+      const entry = entries.find(x => x.uuid === uuid);
+      if (entry?.password) {
+        await LKUtils.copyToClipboard(entry.password, 'Password copiada!');
+      }
+    });
+  });
 }

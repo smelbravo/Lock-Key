@@ -16,7 +16,7 @@ Response::requireMethod('POST');
 
 $user = AuthMiddleware::require();
 $body = Response::getJsonBody();
-Response::requireFields($body, ['uuid', 'title_enc', 'password_enc', 'iv']);
+Response::requireFields($body, ['uuid']);
 
 $uuid = sanitize($body['uuid'], 36);
 
@@ -29,6 +29,24 @@ $entry = Database::fetchOne(
 if ($entry === null) {
     Response::notFound('Entrada não encontrada.');
 }
+
+// CASO ESPECIAL: pedido para apenas registar uso (sem reencriptar)
+// O frontend envia { uuid, update_last_used: true } quando o utilizador
+// revela/copia a password sem editar — não exige título/password/iv.
+$updateOnlyLastUsed =
+    isset($body['update_last_used']) && $body['update_last_used'] === true
+    && !isset($body['title_enc']) && !isset($body['password_enc']) && !isset($body['iv']);
+
+if ($updateOnlyLastUsed) {
+    Database::execute(
+        'UPDATE vault_entries SET last_used = NOW() WHERE uuid = ? AND user_id = ?',
+        [$uuid, $user['id']]
+    );
+    Response::success(['uuid' => $uuid], 'Última utilização atualizada.');
+}
+
+// Caso normal: edição completa — exige título, password e IV
+Response::requireFields($body, ['title_enc', 'password_enc', 'iv']);
 
 // Validar IV
 $iv = $body['iv'] ?? '';

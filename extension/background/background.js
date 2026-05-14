@@ -65,13 +65,28 @@ async function handleDetectedCredentials(data, tab) {
   }
 }
 
-// Limpar credenciais pendentes antigas (mais de 5 min)
-setInterval(async () => {
-  const data = await browser.storage.local.get('pendingCredential');
-  if (data.pendingCredential) {
-    const age = Date.now() - data.pendingCredential.timestamp;
-    if (age > 300000) { // 5 minutos
-      browser.storage.local.remove('pendingCredential');
+// ============================================================
+// LIMPEZA DE CREDENCIAIS PENDENTES (mais de 5 min)
+// ============================================================
+// IMPORTANTE: setInterval não é fiável em event-pages MV2 — o browser pode
+// suspender o script e o timer não dispara. Usamos browser.alarms que persiste.
+
+const CLEAN_ALARM = 'lk_clean_pending';
+const PENDING_TTL_MS = 300000; // 5 minutos
+
+browser.alarms.create(CLEAN_ALARM, { periodInMinutes: 1 });
+
+browser.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== CLEAN_ALARM) return;
+  try {
+    const data = await browser.storage.local.get('pendingCredential');
+    if (data.pendingCredential) {
+      const age = Date.now() - (data.pendingCredential.timestamp || 0);
+      if (age > PENDING_TTL_MS) {
+        await browser.storage.local.remove('pendingCredential');
+      }
     }
+  } catch (err) {
+    console.warn('[Lock&Key] alarm cleanup failed:', err);
   }
-}, 60000);
+});

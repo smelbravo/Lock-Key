@@ -65,17 +65,48 @@ const ExtCrypto = {
       return btoa(String.fromCharCode(...new Uint8Array(ct)));
     };
 
+    // Cálculo simples de força (0-4) para evitar enviar sempre 0 ao servidor
+    const strength = (pw) => {
+      if (!pw) return 0;
+      let s = 0;
+      if (pw.length >= 8)  s++;
+      if (pw.length >= 12) s++;
+      if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++;
+      if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) s++;
+      return Math.min(4, s);
+    };
+
     return {
       title_enc:    await encField(entry.title),
       url_enc:      await encField(entry.url),
       username_enc: await encField(entry.username),
       password_enc: await encField(entry.password),
+      notes_enc:    await encField(entry.notes),
+      category_enc: await encField(entry.category),
+      tags_enc:     await encField(entry.tags),
       iv: ivB64,
-      strength_score: 0,
-      is_favourite: false,
+      strength_score: strength(entry.password),
+      is_favourite: entry.is_favourite ?? false,
     };
   }
 };
+
+/**
+ * Comparação segura de domínios — evita match parcial (`evil-google.com` ≠ `google.com`).
+ * Devolve true se `entryDomain` é exactamente igual a `currentDomain` ou subdomínio dele.
+ */
+function domainsMatch(entryUrl, currentDomain) {
+  if (!entryUrl || !currentDomain) return false;
+  let entryHost;
+  try {
+    entryHost = new URL(entryUrl).hostname.replace(/^www\./, '');
+  } catch {
+    return false;
+  }
+  if (entryHost === currentDomain) return true;
+  // permitir subdomínios: account.google.com matcha google.com
+  return entryHost.endsWith('.' + currentDomain);
+}
 
 // Estado do popup
 const State = {
@@ -130,13 +161,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Verificar se há credencial pendente para guardar
-  browser.storage.local.get('pendingCredential').then(data => {
-    if (data.pendingCredential) {
-      State.pendingCredential = data.pendingCredential;
-      showSaveBar(data.pendingCredential);
-    }
-  });
+  // Verificar se há credencial pendente para guardar — apenas se autenticado.
+  // Caso contrário, o utilizador veria o domínio capturado sem ter feito login (info leak).
+  if (State.accessToken && State.encKey) {
+    browser.storage.local.get('pendingCredential').then(data => {
+      if (data.pendingCredential) {
+        State.pendingCredential = data.pendingCredential;
+        showSaveBar(data.pendingCredential);
+      }
+    });
+  }
 
   initEvents();
 });
@@ -268,10 +302,7 @@ function applyFilter() {
   let result = [...State.entries];
 
   if (tab === 'site' && State.currentDomain) {
-    result = result.filter(e => {
-      try { return new URL(e.url || '').hostname.includes(State.currentDomain); }
-      catch { return (e.url || '').includes(State.currentDomain); }
-    });
+    result = result.filter(e => domainsMatch(e.url, State.currentDomain));
   } else if (tab === 'recent') {
     // Ordenar por last_used (não temos em tempo real, mostrar todos)
     result = result.slice(0, 10);
@@ -298,7 +329,7 @@ function renderEntries() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
-        <span>${State.searchQuery ? 'Sem resultados para "' + State.searchQuery + '"' : 'Nenhuma entrada'}</span>
+        <span>${State.searchQuery ? 'Sem resultados para "' + escapeHtml(State.searchQuery) + '"' : 'Nenhuma entrada'}</span>
       </div>
     `;
     return;
@@ -306,9 +337,7 @@ function renderEntries() {
 
   listEl.innerHTML = State.filteredEntries.map(entry => {
     const initial = (entry.title || '?')[0].toUpperCase();
-    const isMatch = State.currentDomain && entry.url
-      ? entry.url.includes(State.currentDomain)
-      : false;
+    const isMatch = domainsMatch(entry.url, State.currentDomain);
 
     return `
       <div class="entry-item ${isMatch ? 'autofill-match' : ''}" data-uuid="${entry.uuid}">
@@ -464,21 +493,25 @@ function initEvents() {
       await apiRequest('/auth/logout.php', 'POST', {});
     } finally {
       await clearSession();
+      // Limpar TUDO o que possa ter informação sensível
+      try { await browser.storage.local.remove('pendingCredential'); } catch {}
       State.accessToken = null;
       State.encKey = null;
       State.user = null;
       State.entries = [];
+      State.filteredEntries = [];
+      State.pendingCredential = null;
+      // Ocultar save bar se estiver aberta
+      document.getElementById('save-credential-bar')?.classList.add('hidden');
       showLoginScreen();
     }
   });
 
   // Autofill no site bar
   document.getElementById('autofill-all-btn').addEventListener('click', () => {
-    const match = State.entries.find(e => {
-      try { return new URL(e.url || '').hostname.includes(State.currentDomain); }
-      catch { return false; }
-    });
+    const match = State.entries.find(e => domainsMatch(e.url, State.currentDomain));
     if (match) autofillEntry(match);
+    else showNotification('Nenhuma entrada corresponde a este domínio.');
   });
 
   // Guardar credencial pendente
@@ -521,7 +554,55 @@ function initEvents() {
 // UTILITÁRIOS
 // ============================================================
 
-async function apiRequest(endpoint, method = 'GET', body = null) {
+/**
+ * Endpoints onde NÃO se deve tentar refresh automático (evitar loops).
+ */
+const NO_REFRESH_ENDPOINTS = ['/auth/login.php', '/auth/refresh.php', '/auth/get_salt.php'];
+
+let refreshPromise = null;
+
+async function tryRefreshToken() {
+  // Singleton: se já há um refresh em curso, partilhar a mesma promise
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    const session = await getStoredSession();
+    if (!session?.refreshToken) return false;
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/refresh.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: session.refreshToken }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return false;
+
+      const { access_token, refresh_token, user } = data.data || {};
+      if (!access_token) return false;
+
+      State.accessToken = access_token;
+      if (user) State.user = user;
+
+      // Guardar nova sessão preservando rawKey (chave AES) e dados antigos do user
+      await saveSession({
+        ...session,
+        accessToken: access_token,
+        refreshToken: refresh_token || session.refreshToken,
+        user: user || session.user,
+      });
+      return true;
+    } catch {
+      return false;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+async function apiRequest(endpoint, method = 'GET', body = null, _retry = false) {
   const opts = {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -549,6 +630,20 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
   } catch {
     if (!res.ok) throw new Error(`Erro do servidor (${res.status}).`);
     data = {};
+  }
+
+  // 401 → tentar refresh do access_token uma vez e repetir o pedido
+  if (res.status === 401 && !_retry && !NO_REFRESH_ENDPOINTS.includes(endpoint)) {
+    const refreshed = await tryRefreshToken();
+    if (refreshed) {
+      return apiRequest(endpoint, method, body, true);
+    }
+    // Refresh falhou — limpar sessão e mostrar login
+    await clearSession();
+    State.accessToken = null;
+    State.encKey = null;
+    State.user = null;
+    showLoginScreen();
   }
 
   if (!res.ok) throw new Error(data.message || `Erro ${res.status}`);

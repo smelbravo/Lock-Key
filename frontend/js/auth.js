@@ -5,17 +5,22 @@
 
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Redirecionar para dashboard se já estiver autenticado
-  if (LKApi.isLoggedIn() && LKCrypto.hasSessionKey()) {
-    const page = LKUtils.getCurrentPage();
-    if (page === 'login' || page === 'register') {
+document.addEventListener('DOMContentLoaded', async () => {
+  const page = LKUtils.getCurrentPage();
+
+  // Redirecionar para dashboard se já estiver autenticado.
+  // Tentar primeiro restaurar a chave do sessionStorage (que persiste entre páginas mas não entre tabs novas).
+  if (LKApi.isLoggedIn()) {
+    let hasKey = LKCrypto.hasSessionKey();
+    if (!hasKey && typeof LKCrypto.restoreSessionKey === 'function') {
+      try { hasKey = await LKCrypto.restoreSessionKey(); } catch {}
+    }
+    if (hasKey && (page === 'login' || page === 'register')) {
       window.location.href = '/Lock%26Key/frontend/dashboard.html';
       return;
     }
   }
 
-  const page = LKUtils.getCurrentPage();
   if (page === 'login')    initLoginPage();
   if (page === 'register') initRegisterPage();
 });
@@ -33,6 +38,16 @@ function initLoginPage() {
   const errorDiv     = document.getElementById('auth-error');
   const errorMsg     = document.getElementById('auth-error-msg');
   const derivingDiv  = document.getElementById('deriving-keys');
+
+  // Feedback após registo bem-sucedido (?registered=1)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === '1' && typeof LKToast !== 'undefined') {
+      LKToast.success('Conta criada com sucesso! Faz login para continuar.');
+      // Limpar query string para não repetir o toast em refresh
+      history.replaceState(null, '', window.location.pathname);
+    }
+  } catch {}
 
   // Toggle mostrar/ocultar senha
   if (togglePassBtn) {

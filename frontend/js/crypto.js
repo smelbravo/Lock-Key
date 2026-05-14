@@ -284,25 +284,33 @@ const LKCrypto = (() => {
 
   /**
    * Encripta uma nota segura.
+   * NOTA: O backend exige `title_enc` e `content_enc` obrigatórios — por isso
+   * encriptamos mesmo quando o conteúdo é uma string vazia (encField vs encFieldOpt).
    */
   async function encryptNote(note, key) {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ivB64 = bytesToBase64(iv);
 
+    // Encripta sempre (mesmo string vazia) — usado para campos obrigatórios
     const encField = async (value) => {
-      if (!value) return null;
       const ciphertext = await crypto.subtle.encrypt(
         { name: 'AES-GCM', iv, tagLength: 128 },
         key,
-        encode(String(value))
+        encode(String(value ?? ''))
       );
       return bytesToBase64(ciphertext);
     };
 
+    // Encripta apenas se houver valor (devolve null caso contrário)
+    const encFieldOpt = async (value) => {
+      if (value === null || value === undefined || value === '') return null;
+      return encField(value);
+    };
+
     return {
-      title_enc:    await encField(note.title),
-      content_enc:  await encField(note.content),
-      category_enc: await encField(note.category),
+      title_enc:    await encField(note.title || 'Sem título'),
+      content_enc:  await encField(note.content || ''),
+      category_enc: await encFieldOpt(note.category),
       iv:           ivB64,
       is_favourite: note.is_favourite ?? false,
     };

@@ -274,6 +274,17 @@ const LKApi = (() => {
     });
   }
 
+  /**
+   * Elimina a conta autenticada (irreversível). Requer auth_key (hex 64) derivado da senha mestra.
+   * retry=false para que 401 por senha incorreta não dispare refresh de token.
+   */
+  async function deleteAccount(authKey) {
+    return request('/user/delete_account.php', {
+      method: 'POST',
+      body: JSON.stringify({ auth_key: authKey }),
+    }, false);
+  }
+
   // ============================================================
   // REQUEST GENÉRICO (para Admin Panel e outros consumidores)
   // ============================================================
@@ -316,6 +327,7 @@ const LKApi = (() => {
     getProfile,
     updateProfile,
     changePassword,
+    deleteAccount,
     isLoggedIn,
     getStoredUser,
     clearTokens,

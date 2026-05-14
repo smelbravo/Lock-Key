@@ -63,13 +63,20 @@ if ($titleEnc === null || $passwordEnc === null) {
 $strengthScore = max(0, min(4, (int) ($body['strength_score'] ?? 0)));
 $isFavourite   = (bool) ($body['is_favourite'] ?? false);
 
-// Verificar limite de entradas por utilizador (ex: 10.000)
+// Verificar limite de entradas conforme o plano do utilizador
+$plan      = $user['plan'] ?? 'free';
+$limits    = getPlanLimits($plan);
+$vaultMax  = $limits['vault_max'];
+
 $count = Database::fetchOne(
     'SELECT COUNT(*) as cnt FROM vault_entries WHERE user_id = ?',
     [$user['id']]
 );
-if ((int) $count['cnt'] >= 10000) {
-    Response::error('Limite de entradas no cofre atingido (10.000).', 429);
+if ((int) $count['cnt'] >= $vaultMax) {
+    Response::error(
+        "Limite do plano '{$plan}' atingido ({$vaultMax} entradas). Faz upgrade para guardar mais.",
+        429
+    );
 }
 
 $uuid = Encryption::generateUUID();

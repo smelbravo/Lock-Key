@@ -151,16 +151,15 @@ function initSettingsEvents() {
       if (!parsed || typeof parsed !== 'object') {
         throw new Error('Ficheiro inválido.');
       }
-      LKToast.info('Funcionalidade de importação em desenvolvimento. O ficheiro foi validado.');
-      // TODO: importar entradas e notas re-encriptadas (precisa endpoint dedicado)
+      LKToast.info('A importar…');
+      await importVaultBackup(parsed);
     } catch (err) {
-      LKToast.error('Erro a ler o ficheiro: ' + err.message);
+      LKToast.error('Erro a importar: ' + err.message);
     } finally {
       e.target.value = '';
     }
   });
 
-  // Eliminar conta (apenas confirmação visual; backend ainda não implementa endpoint definitivo)
   document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
     const confirm1 = confirm('Tens a certeza ABSOLUTA que queres eliminar a conta? Esta ação é IRREVERSÍVEL.');
     if (!confirm1) return;
@@ -169,8 +168,165 @@ function initSettingsEvents() {
       LKToast.info('Eliminação cancelada.');
       return;
     }
-    LKToast.warning('A eliminação de contas pela UI ainda não está disponível. Contacta o administrador.');
+    const masterPass = prompt('Introduz a senha mestra para confirmar a eliminação:');
+    if (!masterPass) {
+      LKToast.info('Eliminação cancelada.');
+      return;
+    }
+
+    const btn = document.getElementById('delete-account-btn');
+    LKUtils.setButtonLoading(btn, true);
+    try {
+      const user = LKApi.getStoredUser();
+      if (!user?.email) throw new Error('Sessão inválida.');
+
+      const saltData = await LKApi.getSalt(user.email);
+      const { authKey } = await LKCrypto.deriveKeys(
+        masterPass,
+        user.email,
+        saltData.salt,
+        saltData.iterations
+      );
+
+      await LKApi.deleteAccount(authKey);
+      LKToast.success('Conta eliminada.');
+      LKApi.clearTokens();
+      LKCrypto.clearSessionKey();
+      window.location.href = '/Lock%26Key/frontend/login.html';
+    } catch (err) {
+      LKToast.error(err.message);
+    } finally {
+      LKUtils.setButtonLoading(btn, false);
+    }
   });
+}
+
+/**
+ * Importa entradas e notas a partir de um JSON exportado pela própria app.
+ * Os ciphertexts são criados de novo no servidor (novos UUIDs).
+ * Só é permitido se o backup for desta conta (user_uuid) ou, em exports antigos,
+ * se a chave de sessão actual conseguir desencriptar uma entrada de teste.
+ */
+function unwrapVaultExport(raw) {
+  if (!raw || typeof raw !== 'object') return raw;
+  const inner = raw.data;
+  if (
+    inner && typeof inner === 'object' &&
+    (inner.export_version != null || Array.isArray(inner.entries) || Array.isArray(inner.notes))
+  ) {
+    return inner;
+  }
+  return raw;
+}
+
+async function importVaultBackup(parsed) {
+  parsed = unwrapVaultExport(parsed);
+  const ver = parsed.export_version;
+  if (ver && ver !== '1.0') {
+    throw new Error(`Versão de exportação não suportada: ${ver}`);
+  }
+
+  const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+  const notes = Array.isArray(parsed.notes) ? parsed.notes : [];
+
+  await assertBackupDecryptableForCurrentUser(parsed, entries);
+
+  let okE = 0;
+  let okN = 0;
+  let failE = 0;
+  let failN = 0;
+  let stoppedByLimit = false;
+
+  for (const e of entries) {
+    const payload = {
+      title_enc:    e.title_enc,
+      password_enc: e.password_enc,
+      url_enc:      e.url_enc ?? null,
+      username_enc: e.username_enc ?? null,
+      notes_enc:    e.notes_enc ?? null,
+      category_enc: e.category_enc ?? null,
+      tags_enc:     e.tags_enc ?? null,
+      iv:           e.iv,
+      strength_score: Math.max(0, Math.min(4, Number(e.strength_score) || 0)),
+      is_favourite:   !!e.is_favourite,
+    };
+    if (!payload.iv || !payload.title_enc || !payload.password_enc) {
+      failE++;
+      continue;
+    }
+    try {
+      await LKApi.createVaultEntry(payload);
+      okE++;
+    } catch (err) {
+      failE++;
+      if (err.message && /limite|Limite|429/i.test(err.message)) {
+        stoppedByLimit = true;
+        break;
+      }
+    }
+  }
+
+  if (!stoppedByLimit) {
+    for (const n of notes) {
+      const payload = {
+        title_enc:    n.title_enc,
+        content_enc:  n.content_enc,
+        category_enc: n.category_enc ?? null,
+        iv:           n.iv,
+      };
+      if (!payload.iv || !payload.title_enc || payload.content_enc == null) {
+        failN++;
+        continue;
+      }
+      try {
+        await LKApi.createNote(payload);
+        okN++;
+      } catch (err) {
+        failN++;
+        if (err.message && /limite|Limite|429/i.test(err.message)) break;
+      }
+    }
+  }
+
+  const parts = [
+    `${okE} entrada(s)`,
+    `${okN} nota(s)`,
+  ];
+  if (failE || failN) {
+    parts.push(`${failE + failN} falha(s) ou ignorados`);
+  }
+  if (stoppedByLimit) {
+    parts.push('interrompido: limite do plano');
+  }
+  LKToast.success('Importação concluída: ' + parts.join(' · ') + '.');
+}
+
+async function assertBackupDecryptableForCurrentUser(parsed, entries) {
+  const u = LKApi.getStoredUser();
+  if (!u?.uuid) throw new Error('Sessão inválida.');
+
+  if (parsed.user_uuid) {
+    if (parsed.user_uuid !== u.uuid) {
+      throw new Error(
+        'Este ficheiro pertence a outra conta. Só podes importar backups exportados da tua conta actual.'
+      );
+    }
+    return;
+  }
+
+  const key = LKCrypto.getSessionKey();
+  if (!key) {
+    throw new Error('Desbloqueia o cofre (abre o dashboard) antes de importar este backup sem identificador de conta.');
+  }
+  if (entries.length === 0) return;
+
+  const probe = { ...entries[0], uuid: entries[0].uuid || 'import-probe' };
+  const dec = await LKCrypto.decryptEntry(probe, key);
+  if (entries[0].title_enc && dec.title === '[Erro de desencriptação]') {
+    throw new Error(
+      'Não foi possível desencriptar este backup. Usa a mesma senha mestra que na exportação e desbloqueia o cofre.'
+    );
+  }
 }
 
 async function handleChangePassword() {

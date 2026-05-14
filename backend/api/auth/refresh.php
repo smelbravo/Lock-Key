@@ -14,6 +14,9 @@ require_once dirname(__DIR__, 2) . '/bootstrap.php';
 
 Response::requireMethod('POST');
 
+// Rate limit por IP (proteção contra abuso de rotação de tokens)
+RateLimit::checkRefresh();
+
 $body = Response::getJsonBody();
 Response::requireFields($body, ['refresh_token']);
 

@@ -64,6 +64,12 @@ class RateLimit
                     $retryAfter = $blockedUntil - $now;
                     Response::tooManyRequests($retryAfter);
                 }
+                // Bloqueio expirou — limpar para evitar bloqueio fantasma
+                Database::execute(
+                    'UPDATE rate_limits SET blocked_until = NULL WHERE identifier = ? AND action = ?',
+                    [$identifier, $action]
+                );
+                $record['blocked_until'] = null;
             }
 
             $windowStart = strtotime($record['window_start']);
@@ -168,5 +174,15 @@ class RateLimit
     {
         $ip = AuthMiddleware::getClientIp();
         self::check($ip, 'register', RATE_LIMIT_REGISTER_MAX, RATE_LIMIT_REGISTER_WINDOW);
+    }
+
+    /**
+     * Verificar rate limit para refresh token (evita abuso de rotação)
+     * 60 tentativas em 15 minutos por IP é largamente suficiente para uso legítimo.
+     */
+    public static function checkRefresh(): void
+    {
+        $ip = AuthMiddleware::getClientIp();
+        self::check($ip, 'refresh', 60, 900);
     }
 }

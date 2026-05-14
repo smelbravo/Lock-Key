@@ -211,12 +211,18 @@ if ($method === 'PATCH') {
         Response::forbidden('Sem permissão para modificar o Admin Master.');
     }
 
+    $isSelf = ((int) $user['id'] === $target);
+
     $updates = [];
     $params  = [];
 
     if (isset($body['role']) && $user['role'] === 'admin_master') {
         if (!in_array($body['role'], ['user', 'admin', 'admin_master'], true)) {
             Response::error('Role inválida.', 422);
+        }
+        // Proteção: admin_master não pode auto-rebaixar (evitar lock-out total do sistema)
+        if ($isSelf && $targetUser['role'] === 'admin_master' && $body['role'] !== 'admin_master') {
+            Response::forbidden('Não podes rebaixar a tua própria conta de Admin Master.');
         }
         $updates[] = 'role = ?';
         $params[]  = $body['role'];
@@ -231,6 +237,10 @@ if ($method === 'PATCH') {
     if (isset($body['status'])) {
         if (!in_array($body['status'], ['active', 'suspended', 'banned'], true)) {
             Response::error('Status inválido.', 422);
+        }
+        // Proteção: ninguém se pode suspender/banir a si próprio
+        if ($isSelf && $body['status'] !== 'active') {
+            Response::forbidden('Não podes suspender ou banir a tua própria conta.');
         }
         $updates[] = 'status = ?';
         $params[]  = $body['status'];
@@ -270,6 +280,10 @@ if ($method === 'DELETE') {
     $targetUser = Database::fetchOne('SELECT id, role FROM users WHERE id = ?', [$target]);
     if ($targetUser === null) Response::notFound('Utilizador não encontrado.');
 
+    // Ninguém pode eliminar/banir-se a si próprio via API admin
+    if ((int) $user['id'] === $target) {
+        Response::forbidden('Não podes eliminar ou banir a tua própria conta.');
+    }
     if ($targetUser['role'] === 'admin_master') {
         Response::forbidden('Não é possível remover o Admin Master.');
     }

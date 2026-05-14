@@ -64,10 +64,18 @@ if ($user !== null && $user['locked_until'] !== null) {
 }
 
 // Verificar credenciais (tempo constante para prevenir timing attacks)
-// Se utilizador não existe, executamos verificação falsa para manter tempo consistente
+// Se utilizador não existe, executamos verificação falsa para manter tempo consistente.
+// IMPORTANTE: sem este "fake verify", um atacante consegue distinguir emails registados
+// de não-registados medindo o tempo de resposta (Argon2id demora ~250ms vs <1ms).
 $validCredentials = false;
 if ($user !== null) {
     $validCredentials = Encryption::verifyPassword($authKey, $user['auth_key_hash']);
+} else {
+    // Hash dummy fixo para garantir tempo de resposta consistente
+    // (gerado uma vez com Encryption::hashPassword('dummy'))
+    $dummyHash = '$argon2id$v=19$m=65536,t=4,p=2$ZHVtbXlzYWx0ZHVtbXk$' .
+                 'ZHVtbXloYXNoZHVtbXloYXNoZHVtbXloYXNoZHVtbXloYXNoZHVtbXk';
+    Encryption::verifyPassword($authKey, $dummyHash); // ignorar resultado
 }
 
 if (!$validCredentials) {

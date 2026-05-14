@@ -28,18 +28,29 @@ function validateNoteField(?string $v, string $f, int $maxLen = 65535): ?string
     return $v;
 }
 
-$titleEnc   = validateNoteField($body['title_enc'] ?? null, 'title_enc');
-$contentEnc = validateNoteField($body['content_enc'] ?? null, 'content_enc', 1048576); // 1MB
+$titleEnc    = validateNoteField($body['title_enc'] ?? null, 'title_enc');
+$contentEnc  = validateNoteField($body['content_enc'] ?? null, 'content_enc', 1048576); // 1MB
 $categoryEnc = validateNoteField($body['category_enc'] ?? null, 'category_enc');
 
-if ($titleEnc === null || $contentEnc === null) {
-    Response::error('Título e conteúdo são obrigatórios.', 422);
+// Título é obrigatório; conteúdo pode ser encriptação de string vazia (nota sem texto)
+if ($titleEnc === null) {
+    Response::error('Título é obrigatório.', 422);
+}
+if ($contentEnc === null) {
+    Response::error('Conteúdo (encriptado) é obrigatório.', 422);
 }
 
-// Limite de notas
+// Verificar limite de notas conforme o plano do utilizador
+$plan     = $user['plan'] ?? 'free';
+$limits   = getPlanLimits($plan);
+$notesMax = $limits['notes_max'];
+
 $count = Database::fetchOne('SELECT COUNT(*) as cnt FROM secure_notes WHERE user_id = ?', [$user['id']]);
-if ((int) $count['cnt'] >= 1000) {
-    Response::error('Limite de notas atingido (1.000).', 429);
+if ((int) $count['cnt'] >= $notesMax) {
+    Response::error(
+        "Limite do plano '{$plan}' atingido ({$notesMax} notas). Faz upgrade para guardar mais.",
+        429
+    );
 }
 
 $uuid = Encryption::generateUUID();

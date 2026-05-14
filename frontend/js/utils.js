@@ -262,6 +262,8 @@ const LKAutoLock = (() => {
   let warnTimer = null;
 
   function getTimeoutMs() {
+    // Respeitar preferência de auto-bloqueio (toggle nas definições)
+    if (localStorage.getItem('lk_auto_lock') === '0') return 0;
     const mins = parseInt(localStorage.getItem(TIMEOUT_KEY) || '30', 10);
     return mins > 0 ? mins * 60 * 1000 : 0;
   }

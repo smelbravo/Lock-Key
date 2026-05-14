@@ -22,7 +22,8 @@ $user = AuthMiddleware::require();
 
 $onlyFavourite = isset($_GET['favourite']) && $_GET['favourite'] === '1';
 $recentFirst   = isset($_GET['recent']) && $_GET['recent'] === '1';
-$limit         = isset($_GET['limit']) ? min((int) $_GET['limit'], 500) : 500;
+// Clamp do LIMIT entre 1 e 500 — evita LIMIT 0/negativo e queries excessivas
+$limit = isset($_GET['limit']) ? max(1, min((int) $_GET['limit'], 500)) : 500;
 
 $sql    = 'SELECT uuid, title_enc, url_enc, username_enc, password_enc,
                   notes_enc, category_enc, tags_enc, iv,

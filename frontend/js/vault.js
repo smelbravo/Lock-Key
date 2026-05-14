@@ -211,8 +211,8 @@ function attachEntryEvents() {
       const entry = VaultState.entries.find(e => e.uuid === btn.dataset.uuid);
       if (entry?.password) {
         await LKUtils.copyToClipboard(entry.password, 'Password copiada!');
-        // Registar uso
-        LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true });
+        // Registar uso (não bloqueia se falhar)
+        LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true }).catch(() => {});
       }
     });
   });
@@ -340,19 +340,19 @@ function showEntryDetail(uuid) {
         <div class="detail-field-label">Utilizador / Email</div>
         <div class="detail-field-value">
           <span class="value-text">${LKUtils.escapeHtml(entry.username)}</span>
-          <button class="btn btn-icon btn-ghost btn-sm" onclick="LKUtils.copyToClipboard('${LKUtils.escapeHtml(entry.username)}', 'Utilizador copiado!')" data-tooltip="Copiar">
+          <button class="btn btn-icon btn-ghost btn-sm" id="copy-detail-user" data-tooltip="Copiar">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
         </div>
       </div>` : ''}
       <div class="detail-field">
         <div class="detail-field-label">Password</div>
-        <div class="detail-field-value password hidden" id="detail-pass-field">
+        <div class="detail-field-value password" id="detail-pass-field">
           <span class="value-text" id="detail-pass-text">••••••••••••</span>
           <button class="btn btn-icon btn-ghost btn-sm" id="toggle-detail-pass" data-tooltip="Mostrar">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
-          <button class="btn btn-icon btn-ghost btn-sm" onclick="LKUtils.copyToClipboard('${LKUtils.escapeHtml(entry.password)}', 'Password copiada!')" data-tooltip="Copiar">
+          <button class="btn btn-icon btn-ghost btn-sm" id="copy-detail-pass" data-tooltip="Copiar">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>
         </div>
@@ -386,21 +386,42 @@ function showEntryDetail(uuid) {
 
   // Toggle mostrar/ocultar password no painel
   const toggleBtn = document.getElementById('toggle-detail-pass');
+  const copyBtn   = document.getElementById('copy-detail-pass');
   const passText  = document.getElementById('detail-pass-text');
-  const passField = document.getElementById('detail-pass-field');
-  let passwordVisible = false;
+
+  // Respeita a preferência "ocultar passwords por defeito" (definições)
+  const hideByDefault = localStorage.getItem('lk_hide_passwords') !== '0';
+  let passwordVisible = !hideByDefault;
+  if (passwordVisible) {
+    passText.textContent = entry.password || '—';
+    toggleBtn?.setAttribute('data-tooltip', 'Ocultar');
+  }
 
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
       passwordVisible = !passwordVisible;
+      passText.textContent = passwordVisible ? (entry.password || '—') : '••••••••••••';
+      toggleBtn.setAttribute('data-tooltip', passwordVisible ? 'Ocultar' : 'Mostrar');
       if (passwordVisible) {
-        passText.textContent = entry.password || '—';
-        passField.classList.remove('hidden');
+        // Registar uso recente (não bloqueia se falhar)
         LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true }).catch(() => {});
-      } else {
-        passText.textContent = '••••••••••••';
-        passField.classList.add('hidden');
       }
+    });
+  }
+
+  // Copiar password (usa listener real em vez de onclick inline com password no HTML)
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      LKUtils.copyToClipboard(entry.password || '', 'Password copiada!');
+      LKApi.updateVaultEntry({ uuid: entry.uuid, update_last_used: true }).catch(() => {});
+    });
+  }
+
+  // Copiar utilizador/email
+  const copyUserBtn = document.getElementById('copy-detail-user');
+  if (copyUserBtn) {
+    copyUserBtn.addEventListener('click', () => {
+      LKUtils.copyToClipboard(entry.username || '', 'Utilizador copiado!');
     });
   }
 }

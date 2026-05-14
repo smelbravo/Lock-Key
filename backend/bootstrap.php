@@ -70,3 +70,42 @@ function validateEmail(string $email): bool
 {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false && strlen($email) <= 255;
 }
+
+/**
+ * Obter limites do plano do utilizador
+ *
+ * Devolve ['vault_max' => int, 'notes_max' => int] consultando a tabela `plan_limits`.
+ * Se a tabela não existir (migration_roles não foi corrida) ou o plano não estiver
+ * registado, devolve limites por defeito (free).
+ *
+ * @param string $plan 'free' | 'pro' | 'unlimited'
+ * @return array{vault_max:int, notes_max:int}
+ */
+function getPlanLimits(string $plan): array
+{
+    static $cache = [];
+    if (isset($cache[$plan])) return $cache[$plan];
+
+    try {
+        $row = Database::fetchOne(
+            'SELECT vault_max, notes_max FROM plan_limits WHERE plan = ?',
+            [$plan]
+        );
+        if ($row !== null) {
+            return $cache[$plan] = [
+                'vault_max' => (int) $row['vault_max'],
+                'notes_max' => (int) $row['notes_max'],
+            ];
+        }
+    } catch (\Throwable $e) {
+        // Tabela `plan_limits` pode não existir; usar fallback hardcoded
+    }
+
+    // Fallback hardcoded (caso a migration ainda não tenha sido aplicada)
+    $defaults = [
+        'free'      => ['vault_max' => 50,         'notes_max' => 10],
+        'pro'       => ['vault_max' => 500,        'notes_max' => 100],
+        'unlimited' => ['vault_max' => 2147483647, 'notes_max' => 2147483647],
+    ];
+    return $cache[$plan] = $defaults[$plan] ?? $defaults['free'];
+}
