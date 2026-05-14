@@ -15,19 +15,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function initSettingsNav() {
   const navItems = document.querySelectorAll('.settings-nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      navItems.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
 
-      // Esconder todos os painéis de secção (classes dedicadas — evita selectors frágeis em id)
-      document.querySelectorAll('.settings-grid .settings-section').forEach((el) => {
-        el.style.display = 'none';
-      });
+  function activateSection(item) {
+    navItems.forEach((i) => i.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.settings-grid .settings-section').forEach((el) => {
+      el.style.display = 'none';
+    });
+    const section = document.getElementById(`settings-${item.dataset.settings}`);
+    if (section) section.style.display = '';
+  }
 
-      // Mostrar painel selecionado
-      const section = document.getElementById(`settings-${item.dataset.settings}`);
-      if (section) section.style.display = '';
+  navItems.forEach((item) => {
+    item.addEventListener('click', () => activateSection(item));
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activateSection(item);
+      }
     });
   });
 }
@@ -49,7 +54,7 @@ async function loadProfile() {
       }
     }
   } catch (err) {
-    LKToast.error('Erro ao carregar perfil: ' + err.message);
+    LKToast.error('Não foi possível carregar o perfil: ' + err.message);
   }
 }
 
@@ -58,7 +63,7 @@ function initSettingsEvents() {
   document.getElementById('save-profile-btn')?.addEventListener('click', async () => {
     const username = document.getElementById('profile-username').value.trim();
     if (!username || username.length < 3) {
-      LKToast.error('Username deve ter pelo menos 3 caracteres.');
+      LKToast.error('O nome de utilizador deve ter pelo menos 3 caracteres.');
       return;
     }
     try {
@@ -78,7 +83,7 @@ function initSettingsEvents() {
 
   // Revogar todas as sessões
   document.getElementById('revoke-all-sessions')?.addEventListener('click', async () => {
-    if (!confirm('Tens a certeza? Serás desligado de todos os dispositivos.')) return;
+    if (!confirm('Tens a certeza? Vais terminar a sessão em todos os dispositivos.')) return;
     try {
       await LKApi.logout(true);
       window.location.href = '/Lock%26Key/frontend/login.html';
@@ -98,7 +103,7 @@ function initSettingsEvents() {
       a.download = `lockandkey-vault-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      LKToast.success('Cofre exportado com sucesso!');
+      LKToast.success('Cofre exportado.');
     } catch (err) {
       LKToast.error(err.message);
     }
@@ -156,21 +161,21 @@ function initSettingsEvents() {
       LKToast.info('A importar…');
       await importVaultBackup(parsed);
     } catch (err) {
-      LKToast.error('Erro a importar: ' + err.message);
+      LKToast.error('Erro ao importar: ' + err.message);
     } finally {
       e.target.value = '';
     }
   });
 
   document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
-    const confirm1 = confirm('Tens a certeza ABSOLUTA que queres eliminar a conta? Esta ação é IRREVERSÍVEL.');
+    const confirm1 = confirm('Tens a certeza absoluta de que queres eliminar a conta? Esta ação é irreversível.');
     if (!confirm1) return;
     const confirm2 = prompt('Para confirmar, escreve "ELIMINAR" (em maiúsculas):');
     if (confirm2 !== 'ELIMINAR') {
       LKToast.info('Eliminação cancelada.');
       return;
     }
-    const masterPass = prompt('Introduz a senha mestra para confirmar a eliminação:');
+    const masterPass = prompt('Introduz a senha mestra para confirmar a eliminação.');
     if (!masterPass) {
       LKToast.info('Eliminação cancelada.');
       return;
@@ -207,7 +212,7 @@ function initSettingsEvents() {
  * Importa entradas e notas a partir de um JSON exportado pela própria app.
  * Os ciphertexts são criados de novo no servidor (novos UUIDs).
  * Só é permitido se o backup for desta conta (user_uuid) ou, em exports antigos,
- * se a chave de sessão actual conseguir desencriptar uma entrada de teste.
+ * se a chave de sessão atual conseguir desencriptar uma entrada de teste.
  */
 function unwrapVaultExport(raw) {
   if (!raw || typeof raw !== 'object') return raw;
@@ -310,7 +315,7 @@ async function assertBackupDecryptableForCurrentUser(parsed, entries) {
   if (parsed.user_uuid) {
     if (parsed.user_uuid !== u.uuid) {
       throw new Error(
-        'Este ficheiro pertence a outra conta. Só podes importar backups exportados da tua conta actual.'
+        'Este ficheiro pertence a outra conta. Só podes importar cópias exportadas da tua conta atual.'
       );
     }
     return;
@@ -333,7 +338,7 @@ async function assertBackupDecryptableForCurrentUser(parsed, entries) {
 
 async function handleChangePassword() {
   const key = LKCrypto.getSessionKey();
-  if (!key) { LKToast.error('Sessão expirada.'); return; }
+  if (!key) { LKToast.error('Cofre bloqueado ou sessão expirada. Desbloqueia o cofre e tenta de novo.'); return; }
 
   const currentPass = document.getElementById('current-password').value;
   const newPass     = document.getElementById('new-password').value;
