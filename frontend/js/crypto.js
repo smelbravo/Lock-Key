@@ -341,7 +341,7 @@ const LKCrypto = (() => {
       title:       await decField(encNote.title_enc),
       content:     await decField(encNote.content_enc),
       category:    await decField(encNote.category_enc),
-      is_favourite: encNote.is_favourite,
+      is_favourite: !!encNote.is_favourite,
       created_at:  encNote.created_at,
       updated_at:  encNote.updated_at,
     };

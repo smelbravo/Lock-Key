@@ -481,6 +481,27 @@ function initDashboardLayout() {
       if (search) search.focus();
     }
   });
+
+  updateNavCounts();
+}
+
+/** Atualiza badges do cofre e notas na sidebar (todas as páginas da app). */
+async function updateNavCounts() {
+  const vaultBadge = document.getElementById('vault-count');
+  const notesBadge = document.getElementById('notes-count');
+  if (!vaultBadge && !notesBadge) return;
+  if (!LKCrypto.getSessionKey()) return;
+
+  try {
+    const [encEntries, encNotes] = await Promise.all([
+      LKApi.getVaultEntries(),
+      LKApi.getNotes(),
+    ]);
+    if (vaultBadge) vaultBadge.textContent = String(encEntries.length);
+    if (notesBadge) notesBadge.textContent = String(encNotes.length);
+  } catch (_) {
+    /* ignorar — badges ficam no valor anterior */
+  }
 }
 
 // Inicializar tema ao carregar
@@ -493,5 +514,6 @@ window.LKUtils  = LKUtils;
 window.LKTheme  = LKTheme;
 window.LKAutoLock = LKAutoLock;
 window.initDashboardLayout = initDashboardLayout;
+window.updateNavCounts = updateNavCounts;
 
 

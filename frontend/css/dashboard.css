@@ -422,6 +422,22 @@
 .vault-card-username { font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vault-card-footer { display: flex; align-items: center; justify-content: space-between; }
 
+.fav-note-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--info-bg);
+  color: var(--info);
+}
+.fav-note-icon svg { width: 18px; height: 18px; }
+.fav-type-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
 /* Painel de Detalhes da Entrada */
 .entry-detail-panel {
   width: 380px;

@@ -27,6 +27,14 @@ async function loadNotes() {
     const encNotes = await LKApi.getNotes();
     NotesState.notes = await LKCrypto.decryptAllNotes(encNotes, key);
     renderNotesList();
+
+    const noteParam = new URLSearchParams(window.location.search).get('note');
+    if (noteParam) {
+      const note = NotesState.notes.find(n => n.uuid === noteParam);
+      if (note) openNote(note);
+    }
+
+    if (typeof updateNavCounts === 'function') updateNavCounts();
   } catch (err) {
     LKToast.error('Erro ao carregar notas: ' + err.message);
   }
@@ -148,6 +156,7 @@ async function saveCurrentNote() {
 
     document.getElementById('note-last-saved').textContent = 'Guardado agora mesmo';
     renderNotesList();
+    if (typeof updateNavCounts === 'function') updateNavCounts();
     LKToast.success('Nota guardada!', 2000);
 
   } catch (err) {
@@ -173,6 +182,7 @@ async function deleteCurrentNote() {
     if (editArea) editArea.style.display = 'none';
 
     renderNotesList();
+    if (typeof updateNavCounts === 'function') updateNavCounts();
     LKToast.success('Nota eliminada.');
   } catch (err) {
     LKToast.error('Erro ao eliminar nota: ' + err.message);

@@ -45,6 +45,7 @@
           <polyline points="14 2 14 8 20 8"/>
         </svg>
         <span>Notas Seguras</span>
+        <span class="nav-badge" id="notes-count">0</span>
       </a>
 
       <div class="sidebar-section-label">Ferramentas</div>
@@ -241,10 +242,13 @@
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)">
         <h2 style="font-size:var(--font-size-lg);font-weight:700">Favoritos</h2>
-        <a href="vault.html?filter=favourite" style="font-size:13px;color:var(--accent-primary)">Ver todos →</a>
+        <span style="font-size:13px;display:flex;gap:12px">
+          <a href="vault.html?filter=favourite" style="color:var(--accent-primary)">Cofre →</a>
+          <a href="notes.html" style="color:var(--accent-primary)">Notas →</a>
+        </span>
       </div>
       <div id="favourites-empty" class="hidden" style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:var(--border-radius-lg)">
-        Ainda não tens entradas favoritas. Marca uma no cofre!
+        Ainda não tens favoritos. Marca entradas no cofre ou notas em Notas Seguras.
       </div>
       <div class="vault-grid" id="favourite-entries"></div>
     </div>
