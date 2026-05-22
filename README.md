@@ -1,12 +1,10 @@
-# 🔐 Lock & Key — Gestor de Passwords Seguro
+# Lock & Key — Gestor de Passwords Seguro
 
 **Lock & Key** é um gestor de passwords de arquitetura **zero-knowledge** com encriptação **AES-256-GCM**, construído com PHP 8+, MySQL e JavaScript nativo. Inclui um Painel de Admin com controlo de acessos por roles, gerador de passwords dedicado e uma extensão Firefox com autofill automático.
 
-> **URL local:** `http://localhost/Lock%26Key/frontend/`
+**URL local:** `http://localhost/Lock%26Key/frontend/`
 
----
-
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 Lock&Key/
@@ -65,9 +63,7 @@ Lock&Key/
         └── admin.js            # Painel Admin
 ```
 
----
-
-## 🔒 Arquitetura de Segurança Zero-Knowledge
+## Arquitetura de Segurança Zero-Knowledge
 
 ```
 Senha Mestra (nunca sai do browser)
@@ -82,6 +78,7 @@ PBKDF2-SHA256 (200.000 iterações) + vault_salt gerado no CLIENTE
 ```
 
 **Princípios Zero-Knowledge:**
+
 - O `vault_salt` é gerado **no cliente** no momento do registo e enviado ao servidor para armazenamento — o servidor nunca gera o seu próprio salt
 - O servidor **nunca vê**: senha mestra, `encryptionKey`, dados em texto simples
 - **Encriptação**: AES-256-GCM com IV único por entrada
@@ -97,17 +94,15 @@ PBKDF2-SHA256 (200.000 iterações) + vault_salt gerado no CLIENTE
 - **Importar** (página Definições): carregar o `.json` exportado; só é permitido se o campo `user_uuid` do ficheiro for o da conta com sessão iniciada — *ciphertext* de outra conta não pode ser importado. Em backups muito antigos sem `user_uuid`, é feita uma verificação de desencriptação com a chave de sessão do cofre (é preciso ter o cofre desbloqueado). Cada item importado cria **novos** registos (novos UUIDs). A importação para se atingires o limite do plano.
 - **Eliminar conta** (`POST /user/delete_account.php`): envia-se o `auth_key` (hex 64) derivado da senha mestra; remove a conta e dados associados (cascade na BD). O único utilizador `admin_master` do sistema **não** pode eliminar-se a si próprio.
 
----
-
-## 👥 Roles e Planos
+## Roles e Planos
 
 ### Roles de utilizador
 
 | Role | Descrição |
 |------|-----------|
 | `user` | Utilizador normal (padrão ao registar) |
-| `admin` | Acesso ao painel de admin (gestão de utilizadores, audit log) |
-| `admin_master` | Acesso total: pode criar/gerir admins e alterar roles/planos |
+| `admin` | Acesso ao painel Admin (gestão de utilizadores, audit log) |
+| `admin_master` | Acesso total: pode criar/gerir Admins e alterar roles/planos |
 
 ### Planos de subscrição
 
@@ -117,9 +112,7 @@ PBKDF2-SHA256 (200.000 iterações) + vault_salt gerado no CLIENTE
 | `pro` | 500 | 100 | Histórico, exportar |
 | `unlimited` | Ilimitado | Ilimitado | Tudo |
 
----
-
-## ⚙️ Instalação Local (XAMPP)
+## Instalação Local (XAMPP)
 
 ### 1. Instalar XAMPP
 
@@ -131,11 +124,12 @@ PBKDF2-SHA256 (200.000 iterações) + vault_salt gerado no CLIENTE
 ### 2. Copiar o Projeto
 
 Copia a pasta `Lock&Key` (com o `&` no nome) para:
+
 ```
 C:\xampp\htdocs\Lock&Key\
 ```
 
-> **Importante:** Manter o `&` no nome da pasta — o URL usa `Lock%26Key` (codificação URL do `&`).
+**Nota:** Manter o `&` no nome da pasta — o URL usa `Lock%26Key` (codificação URL do `&`).
 
 ### 3. Configurar a Base de Dados
 
@@ -165,18 +159,19 @@ JWT_SECRET=<string hexadecimal de 128 caracteres>
 SERVER_ENCRYPT_KEY=<string hexadecimal de 64 caracteres>
 ```
 
-> Gerar JWT_SECRET em PHP: `echo bin2hex(random_bytes(64));`
+Gerar `JWT_SECRET` em PHP: `echo bin2hex(random_bytes(64));`
 
 ### 5. Criar Conta Admin
 
 Abre o browser em:
+
 ```
 http://localhost/Lock%26Key/setup/create_admin.php
 ```
 
 Segue o formulário para criar a primeira conta `admin_master`. Após criar, **apaga ou protege** este ficheiro.
 
-> O script `create_admin.php` usa o mesmo fluxo zero-knowledge do frontend: gera um `vault_salt` internamente e deriva o `authKey` com PBKDF2, garantindo que o login funciona corretamente.
+O script `create_admin.php` usa o mesmo fluxo zero-knowledge do frontend: gera um `vault_salt` internamente e deriva o `authKey` com PBKDF2, garantindo que o login funciona corretamente.
 
 ### 6. Configurar Apache
 
@@ -196,29 +191,25 @@ Reinicia o Apache após alterar.
 http://localhost/Lock%26Key/frontend/
 ```
 
----
-
-## 🛡️ Painel Admin
+## Painel Admin
 
 Acessível em `/frontend/admin.html` — **apenas para utilizadores com role `admin` ou `admin_master`**.
 
-O link "Painel Admin" aparece automaticamente na sidebar para admins após login.
+O link "Painel Admin" aparece automaticamente na sidebar para Admins após login.
 
 ### Funcionalidades do Painel Admin
 
 | Secção | admin | admin_master |
 |--------|-------|--------------|
-| Visão geral (estatísticas) | ✅ | ✅ |
-| Listar utilizadores | ✅ | ✅ |
-| Ver audit log | ✅ | ✅ |
-| Suspender/ativar utilizadores | ✅ | ✅ |
-| Alterar plano de utilizador | ❌ | ✅ |
-| Alterar role de utilizador | ❌ | ✅ |
-| Criar conta admin | ❌ | ✅ |
+| Visão geral (estatísticas) | Sim | Sim |
+| Listar utilizadores | Sim | Sim |
+| Ver audit log | Sim | Sim |
+| Suspender/ativar utilizadores | Sim | Sim |
+| Alterar plano de utilizador | Não | Sim |
+| Alterar role de utilizador | Não | Sim |
+| Criar conta admin | Não | Sim |
 
----
-
-## 🔑 Gerador de Passwords
+## Gerador de Passwords
 
 Página dedicada em `/frontend/generator.html`.
 
@@ -229,9 +220,7 @@ Página dedicada em `/frontend/generator.html`.
 - Histórico da sessão (últimas 20 passwords geradas)
 - Botão de copiar para a área de transferência
 
----
-
-## 🦊 Extensão Firefox
+## Extensão Firefox
 
 ### Instalar (modo temporário para testes)
 
@@ -258,9 +247,7 @@ Compress-Archive -Path "extension\*" -DestinationPath "lockandkey-extension-v1.0
 
 Submeter em: https://addons.mozilla.org/developers/
 
----
-
-## 📖 Endpoints da API
+## Endpoints da API
 
 ### Autenticação
 
@@ -310,9 +297,7 @@ Submeter em: https://addons.mozilla.org/developers/
 | GET  | `/admin/audit.php` | Ver audit log |
 | POST | `/admin/create_admin.php` | Criar conta admin |
 
----
-
-## 🚀 Deploy em Produção
+## Deploy em Produção
 
 ### Requisitos do Servidor
 
@@ -365,39 +350,42 @@ SERVER_ENCRYPT_KEY=<novo_64_hex>
 - [ ] Porta 3306 não exposta publicamente
 - [ ] Monitorização de logs de erro ativa
 
----
-
-## 🔧 Resolução de Problemas
+## Resolução de Problemas
 
 ### "Credenciais inválidas" após criar conta nova
+
 O registo usa arquitetura zero-knowledge: o `vault_salt` é gerado no cliente e enviado ao servidor. Contas criadas com versões antigas do código (que usavam salt temporário descartado) não conseguem fazer login — precisam de ser recriadas.
 
 ### "Não consegue ligar à base de dados"
+
 - Verifica que o MySQL está a correr no XAMPP
 - Verifica as credenciais em `config/.env`
 - Confirma que a base de dados `lockandkey` existe e que `migration_roles.sql` foi importada
 
 ### "Token JWT inválido"
+
 - `JWT_SECRET` no `.env` deve ter pelo menos 64 caracteres
 - O relógio do servidor deve estar sincronizado
 
 ### Extensão pede login ao reabrir popup
+
 - Confirma que `browser.storage.local` tem permissão no `manifest.json`
 - A sessão é guardada com a chave `rawKey` — versões antigas que usavam `encKey` perdiam sempre a sessão
 
 ### "CORS Error na API"
+
 - Verifica `CORS_ALLOWED_ORIGINS` no `.env`
 - Confirma que `APP_URL` corresponde ao URL da página no browser
 
 ### Dropdown de utilizador não abre
+
 - Atualiza os ficheiros no htdocs — versões antigas tinham `overflow:hidden` no layout que bloqueava o menu
 
 ### UI cortada pela barra de bookmarks do Firefox
+
 - O CSS usa `100dvh` (dynamic viewport height) que exclui a barra de bookmarks automaticamente
 - Confirma que estás a usar os ficheiros CSS mais recentes
 
----
-
-## 📜 Licença
+## Licença
 
 MIT License — Lock & Key © 2026
