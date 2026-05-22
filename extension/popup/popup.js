@@ -674,7 +674,7 @@ function copyToClipboard(text, msg = 'Copiado!') {
 function showNotification(message) {
   browser.notifications.create({
     type: 'basic',
-    iconUrl: browser.runtime.getURL('assets/icon.svg'),
+    iconUrl: browser.runtime.getURL('assets/logo.png'),
     title: 'Lock & Key',
     message,
   });

@@ -392,12 +392,18 @@ ul { list-style: none; }
 }
 .navbar-brand .logo-icon {
   width: 36px; height: 36px;
-  background: var(--accent-gradient);
+  background: transparent;
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-glow);
+  box-shadow: none;
+}
+.navbar-brand .logo-icon img.site-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
 }
 
 .navbar-nav {

@@ -56,18 +56,19 @@
 
 .auth-visual-logo .logo-icon {
   width: 52px; height: 52px;
-  background: var(--accent-gradient);
+  background: transparent;
   border-radius: var(--border-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-glow-strong), 0 0 60px rgba(59,130,246,0.3);
-  animation: glowPulse 3s ease-in-out infinite;
+  box-shadow: none;
 }
 
-.auth-visual-logo .logo-icon svg {
-  width: 28px; height: 28px;
-  color: #fff;
+.auth-visual-logo .logo-icon img.site-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
 }
 
 /* Lock visual animado */
@@ -78,8 +79,10 @@
   animation: float 4s ease-in-out infinite;
 }
 
-.lock-visual svg {
+.lock-visual svg,
+.lock-visual img.site-logo {
   width: 100%; height: 100%;
+  object-fit: contain;
   filter: drop-shadow(0 0 30px rgba(59,130,246,0.5));
 }
 

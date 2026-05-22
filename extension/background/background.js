@@ -53,7 +53,7 @@ async function handleDetectedCredentials(data, tab) {
   // Mostrar notificação
   browser.notifications.create('save-cred', {
     type:    'basic',
-    iconUrl: browser.runtime.getURL('assets/icon.svg'),
+    iconUrl: browser.runtime.getURL('assets/logo.png'),
     title:   'Lock & Key',
     message: `Guardar credenciais para ${domain}? Clica no ícone Lock & Key.`,
   });

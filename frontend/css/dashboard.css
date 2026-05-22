@@ -101,13 +101,14 @@
 }
 .sidebar-brand .brand-icon {
   width: 36px; height: 36px;
-  background: var(--accent-gradient);
+  background: transparent;
   border-radius: var(--border-radius);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  box-shadow: var(--shadow-glow);
+  box-shadow: none;
+  overflow: hidden;
 }
-.sidebar-brand .brand-icon svg { width: 20px; height: 20px; color: #fff; }
+.sidebar-brand .brand-icon img.site-logo { width: 32px; height: 32px; object-fit: contain; display: block; }
 .brand-name {
   font-size: var(--font-size-md);
   font-weight: 800;
