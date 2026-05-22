@@ -406,6 +406,11 @@ function applyUserToHeader(user) {
   if (avatar)    avatar.textContent    = LKUtils.getInitials(user.username || user.email);
   if (welcomeEl) welcomeEl.textContent = user.username || 'utilizador';
 
+  const sidebarUsername = document.getElementById('sidebarUsername');
+  const sidebarAvatar   = document.getElementById('sidebarAvatar');
+  if (sidebarUsername) sidebarUsername.textContent = user.username || '';
+  if (sidebarAvatar)   sidebarAvatar.textContent   = LKUtils.getInitials(user.username || user.email);
+
   if (user.role === 'admin' || user.role === 'admin_master') {
     const adminLink = document.getElementById('adminNavLink');
     if (adminLink) adminLink.style.display = '';
