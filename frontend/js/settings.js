@@ -43,6 +43,15 @@ async function loadProfile() {
     const profile = data?.user ?? data; // compatibilidade com ambos os formatos
 
     if (profile) {
+      LKApi.updateStoredUser({
+        username: profile.username,
+        email:    profile.email,
+        role:     profile.role,
+        plan:     profile.plan,
+        status:   profile.status,
+      });
+      LKUtils.applyUserToHeader(LKApi.getStoredUser());
+
       document.getElementById('profile-name').textContent  = profile.username || '—';
       document.getElementById('profile-email').textContent = profile.email || '—';
       document.getElementById('profile-username').value    = profile.username || '';
@@ -70,6 +79,7 @@ function initSettingsEvents() {
       await LKApi.updateProfile(username);
       document.getElementById('profile-name').textContent = username;
       document.getElementById('profile-avatar').textContent = LKUtils.getInitials(username);
+      LKUtils.applyUserToHeader(LKApi.getStoredUser());
       LKToast.success('Perfil atualizado!');
     } catch (err) {
       LKToast.error(err.message);

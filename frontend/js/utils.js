@@ -206,6 +206,7 @@ const LKUtils = (() => {
     formatDate,
     extractDomain,
     getInitials,
+    applyUserToHeader,
     debounce,
     isValidEmail,
     getFaviconUrl,
@@ -391,6 +392,26 @@ const LKAutoLock = (() => {
 // SIDEBAR E LAYOUT
 // ============================================================
 
+/** Atualiza header e mensagem de boas-vindas com dados do utilizador em sessão. */
+function applyUserToHeader(user) {
+  if (!user) return;
+
+  const nameEl    = document.getElementById('dropdown-name');
+  const emailEl   = document.getElementById('dropdown-email');
+  const avatar    = document.getElementById('user-avatar');
+  const welcomeEl = document.getElementById('welcome-name');
+
+  if (nameEl)    nameEl.textContent    = user.username || 'Utilizador';
+  if (emailEl)   emailEl.textContent   = user.email || '';
+  if (avatar)    avatar.textContent    = LKUtils.getInitials(user.username || user.email);
+  if (welcomeEl) welcomeEl.textContent = user.username || 'utilizador';
+
+  if (user.role === 'admin' || user.role === 'admin_master') {
+    const adminLink = document.getElementById('adminNavLink');
+    if (adminLink) adminLink.style.display = '';
+  }
+}
+
 function initDashboardLayout() {
   const layout     = document.getElementById('app-layout');
   const sidebar    = document.getElementById('sidebar');
@@ -443,22 +464,7 @@ function initDashboardLayout() {
     });
   }
 
-  // Atualizar info do utilizador no header
-  const user = LKApi.getStoredUser();
-  if (user) {
-    const nameEl  = document.getElementById('dropdown-name');
-    const emailEl = document.getElementById('dropdown-email');
-    const avatar  = document.getElementById('user-avatar');
-    if (nameEl)  nameEl.textContent  = user.username || 'Utilizador';
-    if (emailEl) emailEl.textContent = user.email || '';
-    if (avatar)  avatar.textContent  = LKUtils.getInitials(user.username || user.email);
-
-    // Mostrar link do painel admin para admins
-    if (user.role === 'admin' || user.role === 'admin_master') {
-      const adminLink = document.getElementById('adminNavLink');
-      if (adminLink) adminLink.style.display = '';
-    }
-  }
+  LKUtils.applyUserToHeader(LKApi.getStoredUser());
 
   // Logout
   if (logoutBtn) {

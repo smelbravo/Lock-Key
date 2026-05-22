@@ -15,11 +15,7 @@ async function loadDashboardData() {
   const key = LKCrypto.getSessionKey();
   if (!key) return;
 
-  const user = LKApi.getStoredUser();
-
-  // Atualizar nome de boas-vindas
-  const welcomeEl = document.getElementById('welcome-name');
-  if (welcomeEl && user) welcomeEl.textContent = user.username || 'utilizador';
+  LKUtils.applyUserToHeader(LKApi.getStoredUser());
 
   try {
     // Carregar entradas e notas em paralelo

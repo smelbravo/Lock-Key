@@ -36,6 +36,15 @@ const LKApi = (() => {
     catch { return null; }
   }
 
+  /** Atualiza dados do utilizador em sessão (ex.: após editar perfil). */
+  function updateStoredUser(updates) {
+    const user = getStoredUser();
+    if (!user || !updates) return user;
+    const merged = { ...user, ...updates };
+    sessionStorage.setItem(USER_KEY, JSON.stringify(merged));
+    return merged;
+  }
+
   function clearTokens() {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(REFRESH_KEY);
@@ -261,10 +270,12 @@ const LKApi = (() => {
   }
 
   async function updateProfile(username) {
-    return request('/user/profile.php', {
+    const res = await request('/user/profile.php', {
       method: 'POST',
       body: JSON.stringify({ username }),
     });
+    updateStoredUser({ username });
+    return res;
   }
 
   async function changePassword(payload) {
@@ -330,6 +341,7 @@ const LKApi = (() => {
     deleteAccount,
     isLoggedIn,
     getStoredUser,
+    updateStoredUser,
     clearTokens,
     refreshAccessToken,
     request: apiRequest,
